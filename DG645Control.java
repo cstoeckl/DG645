@@ -15,7 +15,7 @@ import javax.swing.*;
  */
 public class DG645Control  {
 	
-	public int asdf=0;
+	public int asdf=1;
 	public static DG645 dg645;
 	public static DG645Gui dg645Gui;
 	
