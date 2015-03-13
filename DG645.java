@@ -16,7 +16,7 @@ import lib.*;
  */
 public class DG645 implements Runnable {
 	
-	private DeviceConnection mConn=null;
+	public DeviceConnection mConn=null;
 	private Thread work;
 	private  String host;
 	private String tmp;
@@ -30,12 +30,117 @@ public class DG645 implements Runnable {
 	public boolean overLimit = false;
 	final static  DecimalFormat valueFormat = new DecimalFormat("0.000");
 	
+	//trigger variables
+	private String mode;
+	private String rate;
+	private String threshold;
+	private String advmode;
+	private String hold;
+	private String edge;
+	private String prescale;
+	private String phase;
+	
+	//burst variables
+	private String burstStatus;
+	private String fireon;
+	private String cnt;
+	private String period;
+	private String delay;
+	
+	//delay variables
+	private String delayChannel;
+	private String linkChannel;
+	private String delayVal;
+	
+	//level variables
+	private String levelChannel;
+	private String offset;
+	private String amplitude;
+	private String polarity;
 	
 	public DG645(String server)
 	{
 		host = server;
 	}
 	
+	public void trigger(String mode, String rate, String threshold, String advmode, String hold, String edge, String prescale, String phase)
+	{
+		if (!initialized) return;
+		
+		if(mode != null)
+			this.mode = mode;
+		if(rate != null)
+			this.rate = rate;
+		if(threshold != null)
+			this.threshold = threshold;
+		if(advmode != null)
+			this.advmode = advmode;
+		if(edge != null)
+			this.edge = edge;
+		if(prescale != null)
+			this.prescale = prescale;
+		if(phase != null)
+			this.phase = phase;
+		
+		work = new Thread(this,"Trigger");
+		isMoving = true;
+		work.start(); 	
+	}
+	
+	public void delay(String delayChannel, String linkChannel, String value)
+	{
+		if (!initialized) return;
+		
+		if(delayChannel != null)
+			this.delayChannel = delayChannel;
+		if(linkChannel != null)
+			this.linkChannel = linkChannel;
+		if(value != null)
+			this.delayVal = value;
+		
+		work = new Thread(this,"Delay");
+		isMoving = true;
+		work.start(); 	
+	}
+	
+	public void burst(String burstStatus, String fireon, String cnt, String period, String delay)
+	{
+		if (!initialized) return;
+		
+		if(burstStatus != null)
+			this.burstStatus = burstStatus;
+		if(fireon != null)
+			this.fireon = fireon;
+		if(cnt != null)
+			this.cnt = cnt;
+		if(period != null)
+			this.period = period;
+		if(delay != null)
+			this.delay = delay;
+		
+		work = new Thread(this,"Burst");
+		isMoving = true;
+		work.start(); 	
+	}
+	
+	public void level(String channel, String offset, String amp, String polarity)
+	{
+		if (!initialized) return;
+		
+		if(channel != null)
+			this.levelChannel = channel;
+		if(offset != null)
+			this.offset = offset;
+		if(amp != null)
+			this.amplitude = amp;
+		if(polarity != null)
+			this.polarity = polarity;
+		
+		work = new Thread(this,"Level");
+		isMoving = true;
+		work.start(); 	
+	}
+
 	public void connect() 
 	{
 		work = new Thread(this,"Connecting");
@@ -44,23 +149,12 @@ public class DG645 implements Runnable {
 		System.out.println("Here at connect");
 	}
 	
-	public void testing()
-	{
-		if (!connected) return;
-		work = new Thread(this, "Test");
-		isMoving = true;
-		work.start();
-		
-		System.out.println("====At test");
-	}
-	
 	public void init() 
 	{
 		if (!connected) return;
 		work = new Thread(this,"Init");
 		isMoving = true;
 		work.start(); 	
-		
 
 		System.out.println("Here at init");
 	}
@@ -129,37 +223,6 @@ public class DG645 implements Runnable {
 			mConn.writeLine("*IDN?");
 			tmp = mConn.readLine();
 			System.out.println("reply: "+ tmp);
-			
-			//=======TESTING AREA
-			/*mConn.writeLine("ADVT 1\n");			//advanced triggering, turn on/off, queries al lwork
-			tmp = mConn.readLine();
-			System.out.println("testing: "+ tmp);*/
-
-	//		mConn.write("DISP 4\n");
-			
-			if (tmp == "1")
-				mConn.writeLine("ADVT 0\n");
-			else
-				mConn.writeLine("ADVT 1\n");
-			mConn.writeLine("ADVT?\n");
-			
-			tmp = mConn.readLine();
-			System.out.println("testing: "+ tmp);
-			
-			mConn.writeLine("TSRC 0\n"); //set internal triggering
-			mConn.writeLine("TRAT 4000\n"); //set trigger rate to 2kHz
-			
-			mConn.writeLine("DISP 0\n");
-			System.out.print("here");
-			/*mConn.write("DLAY 2,0,1e-6\n"); //supposed to change delay but machine does not register change?
-			mConn.write("DLAY 3,2,2e-6\n)");
-			
-			mConn.write("DISP 11,2\n");*/
-			
-			//mConn.write("LERR?\n");
-			System.out.println("last error: " + mConn.readLine());
-			
-			//========END TEST AREA
 			Pos = 0.0;
 			connected = true;
 			isMoving = false;
@@ -175,21 +238,37 @@ public class DG645 implements Runnable {
 			relais = tmp;
 			initialized = true;
 			isMoving = false;
-		/*} else if (work.getName().equals("Test")) {
-			mConn.writeLine("ADVT?");
-			tmp = mConn.readLine();
-			System.out.println("testing: "+ tmp);
-			
-		//	mConn.writeLine("ADVT 1");
-		//	tmp
-			*/
-			
-		} else {
+		} else if(work.getName().equals("Trigger")) { 
+			mConn.writeLine("TSRC " + mode);
+			mConn.writeLine("TRAT " + rate);
+			mConn.writeLine("TLVL," + threshold);
+			mConn.writeLine("ADVT " + advmode);
+			mConn.writeLine("HOLD " + hold);
+			mConn.writeLine("PRES " + edge + "," + prescale); 
+			mConn.writeLine("PHAS " + edge + "," + phase);
+		} else if(work.getName().equals("Burst")) {
+			mConn.writeLine("BURM " + burstStatus);
+			mConn.writeLine("BURT " + fireon);
+			mConn.writeLine("BURC " + cnt);
+			mConn.writeLine("BURP " + period);
+			mConn.writeLine("BURD " + delay);
+		} else if(work.getName().equals("Delay")) {	
+			mConn.writeLine("LINK " + delayChannel + "," + linkChannel);
+			mConn.writeLine("DLAY " + delayChannel + "," + delayVal);
+		} else if(work.getName().equals("Level")) {
+			mConn.writeLine("LOFF " + levelChannel + "," + offset);
+			mConn.writeLine("LAMP " + levelChannel + "," + amplitude);
+			mConn.writeLine("LPOL " + levelChannel + "," + polarity); 
+		}
+		else {
 //			System.out.println("moving");
 			step(z);
 			isMoving = false;	
 		}
 		workDone();
 	}
+	
+	
+
 }
 

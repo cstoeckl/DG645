@@ -1,33 +1,30 @@
-import java.awt.Font;
+import java.awt.*;
 
+import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import lib.DeviceConnection;
+import lib.TimerLabel;
 
 
 public class DG645Gui extends javax.swing.JFrame {
 
+	DG645Action action;
+	
+	//TimerLabel timerLabel;
+	
+	Font deFont = new java.awt.Font("Tahoma", 0, 14);
+	
+	int textHeight = 30;
+	
 	private DeviceConnection mConn=new DeviceConnection("172.20.34.210",5025,System.out);
 	private String temp;
 	private int intemp;
 	private boolean initRun = true;
 
-	/**
-	 * Creates new form DG645Gui
-	 */
-	public DG645Gui() {
 
-		mConn.writeLine("*CLS");
-
-		mConn.writeLine("*IDN?"); 
-		System.out.println("reply: "+ mConn.readLine());
-
-		initComponents();
-		initRun = false;
-
-	}
-
-	private void checkError()
+	
+	public void checkError()
 	{
 		if(!initRun)
 		{	
@@ -55,7 +52,7 @@ public class DG645Gui extends javax.swing.JFrame {
 
 	}
 
-	private void updateDelays(String channel)
+	public void updateDelays(String channel)
 	{
 		mConn.writeLine("DLAY? " + channel);
 		temp = mConn.readLine();
@@ -118,7 +115,7 @@ public class DG645Gui extends javax.swing.JFrame {
 		checkError();
 	}
 
-	private void updateT1()
+	public void updateT1()
 	{
 		mConn.writeLine("DLAY? 1");
 		temp = mConn.readLine().substring(2);
@@ -126,18 +123,137 @@ public class DG645Gui extends javax.swing.JFrame {
 		//labelT1val.repaint();
 	}
 
+	
+	/**
+	 * Creates new form DG645Gui
+	 */
+	public DG645Gui() {
+
+		action=new DG645Action(this);
+		
+		mConn.writeLine("*CLS");
+
+		mConn.writeLine("*IDN?"); 
+		System.out.println("reply: "+ mConn.readLine());
+
+		initComponents();
+		initRun = false;
+
+	}
+
 	@SuppressWarnings("unchecked")
 	// <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-	private void initComponents() {
-
-		triggerModes = new javax.swing.ButtonGroup();
-		triggerAdv = new javax.swing.ButtonGroup();
-		burstOnOff = new javax.swing.ButtonGroup();
-		burstOutput = new javax.swing.ButtonGroup();
-		levelPolarity = new javax.swing.ButtonGroup();
+	private void initComponents()
+	{
 		panelMain = new javax.swing.JPanel();
 		jTabMenus = new javax.swing.JTabbedPane();
+		
+		//frame
+		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		setTitle("DG645 Settings");
+		setPreferredSize(new java.awt.Dimension(1150, 600));
+		
+		//main panel
+		panelMain.setPreferredSize(new java.awt.Dimension(1200, 500));
+		
+		//tabbed panel
+		jTabMenus.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+		jTabMenus.setPreferredSize(new java.awt.Dimension(1200, 500));
+		
+		//menu bar
+		menu();
+		
+		//add revelant tabs to tabbed panel
+		jTabMenus.addTab("Trigger", triggerPanel());
+		jTabMenus.addTab("Burst", burstPanel());
+		jTabMenus.addTab("Delay", delayPanel());
+		jTabMenus.addTab("Level", levelPanel());
+		
+		//main panel layout
+		javax.swing.GroupLayout panelMainLayout = new javax.swing.GroupLayout(panelMain);
+		panelMain.setLayout(panelMainLayout);
+		panelMainLayout.setHorizontalGroup(
+				panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addComponent(jTabMenus, javax.swing.GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE)
+		);
+		panelMainLayout.setVerticalGroup(
+				panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(panelMainLayout.createSequentialGroup()
+						.addComponent(jTabMenus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addGap(0, 0, Short.MAX_VALUE))
+		);
+		
+		
+		
+		
+		//frame layout
+		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+		getContentPane().setLayout(layout);
+		layout.setHorizontalGroup(
+				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addComponent(panelMain, javax.swing.GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE)
+		);
+		layout.setVerticalGroup(
+				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addComponent(panelMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+		);
+
+		pack();
+	}
+	
+	private void menu()
+	{
+		//initializing necessary variabels
+		menuBar = new javax.swing.JMenuBar();
+		menuFile = new javax.swing.JMenu();
+		menuSave = new javax.swing.JMenuItem();
+		menuExit = new javax.swing.JMenuItem();
+		menuEdit = new javax.swing.JMenu();
+		jMenuItem1 = new javax.swing.JMenuItem();
+		menuView = new javax.swing.JMenu();
+		menuTools = new javax.swing.JMenu();
+		
+		menuBar.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+		menuBar.setPreferredSize(new java.awt.Dimension(1200, 30));
+
+		//file
+		menuFile.setText("File");
+
+		menuSave.setText("Save");
+		menuFile.add(menuSave);
+
+		menuExit.setText("Exit");
+		menuFile.add(menuExit);
+
+		menuBar.add(menuFile);
+
+		//edit
+		menuEdit.setText("Edit");
+
+		jMenuItem1.setText("Settings");
+		menuEdit.add(jMenuItem1);
+
+		menuBar.add(menuEdit);
+
+		//view
+		menuView.setText("View");
+		menuBar.add(menuView);
+
+		//tools
+		menuTools.setText("Tools");
+		menuBar.add(menuTools);
+
+		setJMenuBar(menuBar);
+	}
+	
+	private javax.swing.JPanel triggerPanel()
+	{
+		//initializing necessary variables
 		panelTrigger = new javax.swing.JPanel();
+		
+		triggerModes = new javax.swing.ButtonGroup();
+		triggerAdv = new javax.swing.ButtonGroup();
+		
 		txtTrigRate = new javax.swing.JFormattedTextField();
 		txtTrigThres = new javax.swing.JFormattedTextField();
 		buttonTrigOn = new javax.swing.JRadioButton();
@@ -194,98 +310,12 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelSngl = new javax.swing.JLabel();
 		buttonExtF = new javax.swing.JRadioButton();
 		buttonExtR = new javax.swing.JRadioButton();
-		panelBurst = new javax.swing.JPanel();
-		buttonOn = new javax.swing.JRadioButton();
-		buttonOff = new javax.swing.JRadioButton();
-		buttonOutputAll = new javax.swing.JRadioButton();
-		buttonOutputFirst = new javax.swing.JRadioButton();
-		txtCNT = new javax.swing.JFormattedTextField();
-		txtPeriod = new javax.swing.JFormattedTextField();
-		txtDelay = new javax.swing.JFormattedTextField();
-		labelCNT = new javax.swing.JLabel();
-		labelPeriod = new javax.swing.JLabel();
-		labelDelay = new javax.swing.JLabel();
-		panelDelay = new javax.swing.JPanel();
-		labelChannel = new javax.swing.JLabel();
-		labelDelay2 = new javax.swing.JLabel();
-		jPanelT0 = new javax.swing.JPanel();
-		labelEqual = new javax.swing.JLabel();
-		labelT0 = new javax.swing.JLabel();
-		labelChannel0 = new javax.swing.JLabel();
-		labelT0val = new javax.swing.JLabel();
-		panelT1 = new javax.swing.JPanel();
-		labelChannel1 = new javax.swing.JLabel();
-		labelEqual1 = new javax.swing.JLabel();
-		labelT1 = new javax.swing.JLabel();
-		labelT1val = new javax.swing.JLabel();
-		panelA = new javax.swing.JPanel();
-		cboxChannelA = new javax.swing.JComboBox();
-		cboxPMA = new javax.swing.JComboBox();
-		labelEqualA = new javax.swing.JLabel();
-		labelA = new javax.swing.JLabel();
-		txtValA = new javax.swing.JFormattedTextField();
-		panelB = new javax.swing.JPanel();
-		cboxPMB = new javax.swing.JComboBox();
-		labelB = new javax.swing.JLabel();
-		labelEqualB = new javax.swing.JLabel();
-		txtValB = new javax.swing.JFormattedTextField();
-		cboxChannelB = new javax.swing.JComboBox();
-		panelC = new javax.swing.JPanel();
-		cboxChannelC = new javax.swing.JComboBox();
-		cboxPMC = new javax.swing.JComboBox();
-		labelC = new javax.swing.JLabel();
-		labelEqualC = new javax.swing.JLabel();
-		txtValC = new javax.swing.JFormattedTextField();
-		panelD = new javax.swing.JPanel();
-		cboxChannelD = new javax.swing.JComboBox();
-		cboxPMD = new javax.swing.JComboBox();
-		txtValD = new javax.swing.JFormattedTextField();
-		labelD = new javax.swing.JLabel();
-		labelEqualD = new javax.swing.JLabel();
-		panelE = new javax.swing.JPanel();
-		cboxChannelE = new javax.swing.JComboBox();
-		cboxPME = new javax.swing.JComboBox();
-		txtValE = new javax.swing.JFormattedTextField();
-		labelE = new javax.swing.JLabel();
-		labelEqualE = new javax.swing.JLabel();
-		panelF = new javax.swing.JPanel();
-		cboxChannelF = new javax.swing.JComboBox();
-		cboxPMF = new javax.swing.JComboBox();
-		labelF = new javax.swing.JLabel();
-		labelEqualF = new javax.swing.JLabel();
-		txtValF = new javax.swing.JFormattedTextField();
-		panelG = new javax.swing.JPanel();
-		cboxChannelG = new javax.swing.JComboBox();
-		cboxPMG = new javax.swing.JComboBox();
-		labelG = new javax.swing.JLabel();
-		labelEqualG = new javax.swing.JLabel();
-		txtValG = new javax.swing.JFormattedTextField();
-		panelH = new javax.swing.JPanel();
-		cboxChannelH = new javax.swing.JComboBox();
-		cboxPMH = new javax.swing.JComboBox();
-		txtValH = new javax.swing.JFormattedTextField();
-		labelH = new javax.swing.JLabel();
-		labelEqualH = new javax.swing.JLabel();
-		panelLevel = new javax.swing.JPanel();
-		cboxLevel = new javax.swing.JComboBox();
-		labelOffset = new javax.swing.JLabel();
-		labelAmp = new javax.swing.JLabel();
-		labelPolarity = new javax.swing.JLabel();
-		txtOffset = new javax.swing.JFormattedTextField();
-		labelv = new javax.swing.JLabel();
-		txtAmp = new javax.swing.JFormattedTextField();
-		labelv2 = new javax.swing.JLabel();
-		buttonPos = new javax.swing.JRadioButton();
-		buttonNeg = new javax.swing.JRadioButton();
-
-		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		setTitle("DG645 Settings");
-
-		jTabMenus.setTabPlacement(javax.swing.JTabbedPane.RIGHT);
-		jTabMenus.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-		jTabMenus.setPreferredSize(new java.awt.Dimension(750, 1000));
-
-		panelTrigger.setPreferredSize(new java.awt.Dimension(750, 900));
+		jSeparator1 = new javax.swing.JSeparator();
+		//end variable initialization
+		
+		
+		
+		panelTrigger.setPreferredSize(new java.awt.Dimension(1200, 500));
 
 		mConn.writeLine("TRAT?");
 		temp = mConn.readLine().substring(1);
@@ -298,13 +328,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtTrigRate.setText(temp);
 		txtTrigRate.setToolTipText("Internal Triggering");
 		txtTrigRate.setAutoscrolls(false);
-		txtTrigRate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtTrigRate.setFont(deFont); // NOI18N
 		txtTrigRate.setPreferredSize(new java.awt.Dimension(120, 30));
-		txtTrigRate.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtTrigRatePropertyChange(evt);
-			}
-		});
+		txtTrigRate.addPropertyChangeListener(action);
 
 		mConn.writeLine("TLVL?");
 		temp = mConn.readLine(); //.substring(1);
@@ -316,34 +342,22 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtTrigThres.setText(temp);
 		txtTrigThres.setToolTipText("External Triggering; Range -3.50 to +3.50");
-		txtTrigThres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtTrigThres.setFont(deFont); // NOI18N
 		txtTrigThres.setPreferredSize(new java.awt.Dimension(60, 30));
 		txtTrigThres.setRequestFocusEnabled(false);
-		txtTrigThres.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtTrigThresPropertyChange(evt);
-			}
-		});
+		txtTrigThres.addPropertyChangeListener(action);
 
 		triggerAdv.add(buttonTrigOn);
-		buttonTrigOn.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonTrigOn.setFont(deFont); // NOI18N
 		buttonTrigOn.setText("On");
 		buttonTrigOn.setPreferredSize(new java.awt.Dimension(50, 30));
-		buttonTrigOn.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonTrigOnActionPerformed(evt);
-			}
-		});
+		buttonTrigOn.addActionListener(action);
 
 		triggerAdv.add(buttonTrigOff);
-		buttonTrigOff.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonTrigOff.setFont(deFont); // NOI18N
 		buttonTrigOff.setText("Off");
 		buttonTrigOff.setPreferredSize(new java.awt.Dimension(50, 30));
-		buttonTrigOff.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonTrigOffActionPerformed(evt);
-			}
-		});
+		buttonTrigOff.addActionListener(action);
 		mConn.writeLine("ADVT?");
 		switch(Integer.parseInt(mConn.readLine())) {
 		case 0: triggerAdv.setSelected(buttonTrigOff.getModel(), true);
@@ -362,13 +376,10 @@ public class DG645Gui extends javax.swing.JFrame {
 			ex.printStackTrace();
 		}
 		txtHold.setText(temp);
-		txtHold.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtHold.setFont(deFont); // NOI18N
 		txtHold.setPreferredSize(new java.awt.Dimension(160, 30));
-		txtHold.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtHoldPropertyChange(evt);
-			}
-		});
+		txtHold.addPropertyChangeListener(action);
+		
 
 		labelTrigRate.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelTrigRate.setText("Trig Rate");
@@ -382,7 +393,7 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelAdvTrig.setText("Adv. Trig");
 		labelAdvTrig.setPreferredSize(new java.awt.Dimension(90, 30));
 
-		labelHold.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelHold.setFont(deFont); // NOI18N
 		labelHold.setText("Hold");
 		labelHold.setPreferredSize(new java.awt.Dimension(70, 30));
 
@@ -390,44 +401,44 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelPresConfig.setText("Prescaler Configuration");
 		labelPresConfig.setPreferredSize(new java.awt.Dimension(200, 30));
 
-		labelT2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelT2.setFont(deFont); // NOI18N
 		labelT2.setText("T0");
 		labelT2.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		labelA1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelA1.setFont(deFont); // NOI18N
 		labelA1.setText("A");
 		labelA1.setPreferredSize(new java.awt.Dimension(20, 30));
 		labelA1.setRequestFocusEnabled(false);
 
-		labelC1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelC1.setFont(deFont); // NOI18N
 		labelC1.setText("C");
 		labelC1.setPreferredSize(new java.awt.Dimension(20, 30));
 
-		labelE1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelE1.setFont(deFont); // NOI18N
 		labelE1.setText("E");
 		labelE1.setPreferredSize(new java.awt.Dimension(20, 30));
 
-		labelG1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelG1.setFont(deFont); // NOI18N
 		labelG1.setText("G");
 		labelG1.setPreferredSize(new java.awt.Dimension(20, 30));
 
-		labelB1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelB1.setFont(deFont); // NOI18N
 		labelB1.setText("B");
 		labelB1.setPreferredSize(new java.awt.Dimension(20, 30));
 
-		labelD1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelD1.setFont(deFont); // NOI18N
 		labelD1.setText("D");
 		labelD1.setPreferredSize(new java.awt.Dimension(20, 30));
 
-		labelF1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelF1.setFont(deFont); // NOI18N
 		labelF1.setText("F");
 		labelF1.setPreferredSize(new java.awt.Dimension(20, 30));
 
-		labelH1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelH1.setFont(deFont); // NOI18N
 		labelH1.setText("H");
 		labelH1.setPreferredSize(new java.awt.Dimension(20, 30));
 
-		labelTrigPS.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelTrigPS.setFont(deFont); // NOI18N
 		labelTrigPS.setText("TRG Prescale");
 		labelTrigPS.setPreferredSize(new java.awt.Dimension(100, 30));
 
@@ -441,51 +452,48 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtTrigPres.setText(temp);
 		txtTrigPres.setToolTipText("max value 1073741823");
-		txtTrigPres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtTrigPres.setFont(deFont); // NOI18N
 		txtTrigPres.setPreferredSize(new java.awt.Dimension(150, 30));
-		txtTrigPres.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtTrigPresPropertyChange(evt);
-			}
-		});
+		txtTrigPres.addPropertyChangeListener(action);
+		
 
-		labelEdge.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEdge.setFont(deFont); // NOI18N
 		labelEdge.setText("Edge");
 		labelEdge.setPreferredSize(new java.awt.Dimension(50, 30));
 
-		labelEdge2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEdge2.setFont(deFont); // NOI18N
 		labelEdge2.setText("Edge");
 		labelEdge2.setPreferredSize(new java.awt.Dimension(50, 30));
 
-		labelABpres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelABpres.setFont(deFont); // NOI18N
 		labelABpres.setText("AB Prescale");
 		labelABpres.setPreferredSize(new java.awt.Dimension(100, 30));
 
-		labelCDpres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelCDpres.setFont(deFont); // NOI18N
 		labelCDpres.setText("CD Prescale");
 		labelCDpres.setPreferredSize(new java.awt.Dimension(100, 30));
 
-		labelEFpres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEFpres.setFont(deFont); // NOI18N
 		labelEFpres.setText("EF Prescale");
 		labelEFpres.setPreferredSize(new java.awt.Dimension(100, 30));
 
-		labelGHpres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelGHpres.setFont(deFont); // NOI18N
 		labelGHpres.setText("GH Prescale");
 		labelGHpres.setPreferredSize(new java.awt.Dimension(100, 30));
 
-		labelABphase.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelABphase.setFont(deFont); // NOI18N
 		labelABphase.setText("AB Phase");
 		labelABphase.setPreferredSize(new java.awt.Dimension(85, 30));
 
-		labelCDphase.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelCDphase.setFont(deFont); // NOI18N
 		labelCDphase.setText("CD Phase");
 		labelCDphase.setPreferredSize(new java.awt.Dimension(85, 30));
 
-		labelEFphase.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEFphase.setFont(deFont); // NOI18N
 		labelEFphase.setText("EF Phase");
 		labelEFphase.setPreferredSize(new java.awt.Dimension(85, 30));
 
-		labelGHphase.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelGHphase.setFont(deFont); // NOI18N
 		labelGHphase.setText("GH Phase");
 		labelGHphase.setPreferredSize(new java.awt.Dimension(85, 30));
 
@@ -499,13 +507,10 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtABpres.setText(temp);
 		txtABpres.setToolTipText("max value 65535");
-		txtABpres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtABpres.setFont(deFont); // NOI18N
 		txtABpres.setPreferredSize(new java.awt.Dimension(100, 30));
-		txtABpres.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtABpresPropertyChange(evt);
-			}
-		});
+		txtABpres.addPropertyChangeListener(action);
+		
 
 		mConn.writeLine("PRES? 2");
 		temp = mConn.readLine();
@@ -517,13 +522,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtCDpres.setText(temp);
 		txtCDpres.setToolTipText("max value 65535");
-		txtCDpres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtCDpres.setFont(deFont); // NOI18N
 		txtCDpres.setPreferredSize(new java.awt.Dimension(100, 30));
-		txtCDpres.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtCDpresPropertyChange(evt);
-			}
-		});
+		txtCDpres.addPropertyChangeListener(action);
 
 		mConn.writeLine("PRES? 3");
 		temp = mConn.readLine();
@@ -535,13 +536,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtEFpres.setText(temp);
 		txtEFpres.setToolTipText("max value 65535");
-		txtEFpres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtEFpres.setFont(deFont); // NOI18N
 		txtEFpres.setPreferredSize(new java.awt.Dimension(100, 30));
-		txtEFpres.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtEFpresPropertyChange(evt);
-			}
-		});
+		txtEFpres.addPropertyChangeListener(action);
 
 		mConn.writeLine("PRES? 4");
 		temp = mConn.readLine();
@@ -553,13 +550,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtGHpres.setText(temp);
 		txtGHpres.setToolTipText("max value 65535");
-		txtGHpres.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtGHpres.setFont(deFont); // NOI18N
 		txtGHpres.setPreferredSize(new java.awt.Dimension(100, 30));
-		txtGHpres.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtGHpresPropertyChange(evt);
-			}
-		});
+		txtGHpres.addPropertyChangeListener(action);
 
 		mConn.writeLine("PHAS? 1");
 		temp = mConn.readLine();
@@ -571,13 +564,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtABphase.setText(temp);
 		txtABphase.setToolTipText("max value 65534");
-		txtABphase.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtABphase.setFont(deFont); // NOI18N
 		txtABphase.setPreferredSize(new java.awt.Dimension(100, 30));
-		txtABphase.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtABphasePropertyChange(evt);
-			}
-		});
+		txtABphase.addPropertyChangeListener(action);
 
 		mConn.writeLine("PHAS? 2");
 		temp = mConn.readLine();
@@ -589,13 +578,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtCDphase.setText(temp);
 		txtCDphase.setToolTipText("max value 65534");
-		txtCDphase.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtCDphase.setFont(deFont); // NOI18N
 		txtCDphase.setPreferredSize(new java.awt.Dimension(100, 30));
-		txtCDphase.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtCDphasePropertyChange(evt);
-			}
-		});
+		txtCDphase.addPropertyChangeListener(action);
 
 		mConn.writeLine("PHAS? 3");
 		temp = mConn.readLine();
@@ -607,13 +592,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtEFphase.setText(temp);
 		txtEFphase.setToolTipText("max value 65534");
-		txtEFphase.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtEFphase.setFont(deFont); // NOI18N
 		txtEFphase.setPreferredSize(new java.awt.Dimension(100, 30));
-		txtEFphase.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtEFphasePropertyChange(evt);
-			}
-		});
+		txtEFphase.addPropertyChangeListener(action);
 
 		mConn.writeLine("PHAS? 4");
 		temp = mConn.readLine();
@@ -625,13 +606,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtGHphase.setText(temp);
 		txtGHphase.setToolTipText("max value 65534");
-		txtGHphase.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtGHphase.setFont(deFont); // NOI18N
 		txtGHphase.setPreferredSize(new java.awt.Dimension(100, 30));
-		txtGHphase.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtGHphasePropertyChange(evt);
-			}
-		});
+		txtGHphase.addPropertyChangeListener(action);
 
 		javax.swing.GroupLayout panelPresConfigLayout = new javax.swing.GroupLayout(panelPresConfig);
 		panelPresConfig.setLayout(panelPresConfigLayout);
@@ -758,18 +735,14 @@ public class DG645Gui extends javax.swing.JFrame {
 																												.addComponent(labelH1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 																												.addComponent(labelGHphase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 																												.addComponent(txtGHphase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-																												.addGap(0, 55, Short.MAX_VALUE))
+																												.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 
 		triggerModes.add(buttonLine);
-		buttonLine.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonLine.setFont(deFont); // NOI18N
 		buttonLine.setText("LINE");
 		buttonLine.setPreferredSize(new java.awt.Dimension(120, 30));
-		buttonLine.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonLineActionPerformed(evt);
-			}
-		});
+		buttonLine.addActionListener(action);
 		mConn.writeLine("TSRC?");
 		switch(Integer.parseInt(mConn.readLine())) {
 		case 0: triggerModes.setSelected(buttonInt.getModel(), true);
@@ -790,97 +763,73 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 
 		triggerModes.add(buttonSnglExtF);
-		buttonSnglExtF.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonSnglExtF.setFont(deFont); // NOI18N
 		buttonSnglExtF.setText("SNGL EXT ↓");
 		buttonSnglExtF.setPreferredSize(new java.awt.Dimension(120, 30));
-		buttonSnglExtF.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonSnglExtFActionPerformed(evt);
-			}
-		});
+		buttonSnglExtF.addActionListener(action);
 
 		triggerModes.add(buttonSngl);
-		buttonSngl.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonSngl.setFont(deFont); // NOI18N
 		buttonSngl.setText("SNGL");
 		buttonSngl.setPreferredSize(new java.awt.Dimension(120, 30));
-		buttonSngl.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonSnglActionPerformed(evt);
-			}
-		});
+		buttonSngl.addActionListener(action);
 
 		labelMode.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelMode.setText("Select Mode");
 		labelMode.setPreferredSize(new java.awt.Dimension(100, 30));
 
-		labelInt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelInt.setFont(deFont); // NOI18N
 		labelInt.setText("Internal triggering at rates from 100 uHz to MHz");
-		labelInt.setPreferredSize(new java.awt.Dimension(400, 30));
+		labelInt.setPreferredSize(new java.awt.Dimension(300, 30));
 		labelInt.setRequestFocusEnabled(false);
 
-		labelExt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelExt.setFont(deFont); // NOI18N
 		labelExt.setText("External triggering on rising edges");
-		labelExt.setPreferredSize(new java.awt.Dimension(400, 30));
+		labelExt.setPreferredSize(new java.awt.Dimension(300, 30));
 
-		labelExt2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelExt2.setFont(deFont); // NOI18N
 		labelExt2.setText("External triggering on falling edges");
-		labelExt2.setPreferredSize(new java.awt.Dimension(400, 30));
+		labelExt2.setPreferredSize(new java.awt.Dimension(300, 30));
 
-		labelSnglExt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelSnglExt.setFont(deFont); // NOI18N
 		labelSnglExt.setText("Externally triggered single shot on a rising edge");
-		labelSnglExt.setPreferredSize(new java.awt.Dimension(400, 30));
+		labelSnglExt.setPreferredSize(new java.awt.Dimension(300, 30));
 
 		triggerModes.add(buttonSnglExtR);
-		buttonSnglExtR.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonSnglExtR.setFont(deFont); // NOI18N
 		buttonSnglExtR.setText("SNGL EXT ↑");
 		buttonSnglExtR.setPreferredSize(new java.awt.Dimension(120, 30));
-		buttonSnglExtR.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonSnglExtRActionPerformed(evt);
-			}
-		});
+		buttonSnglExtR.addActionListener(action);
 
-		labelSnglExt2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelSnglExt2.setFont(deFont); // NOI18N
 		labelSnglExt2.setText("Externally triggered single shot on a falling edge");
-		labelSnglExt2.setPreferredSize(new java.awt.Dimension(400, 30));
+		labelSnglExt2.setPreferredSize(new java.awt.Dimension(300, 30));
 
 		triggerModes.add(buttonInt);
-		buttonInt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonInt.setFont(deFont); // NOI18N
 		buttonInt.setText("INT");
 		buttonInt.setPreferredSize(new java.awt.Dimension(120, 30));
-		buttonInt.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonIntActionPerformed(evt);
-			}
-		});
+		buttonInt.addActionListener(action);
 
-		labelLine.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelLine.setFont(deFont); // NOI18N
 		labelLine.setText("Trigger at the power line frequency");
-		labelLine.setPreferredSize(new java.awt.Dimension(400, 30));
+		labelLine.setPreferredSize(new java.awt.Dimension(300, 30));
 
-		labelSngl.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelSngl.setFont(deFont); // NOI18N
 		labelSngl.setText("Single shot triggering");
-		labelSngl.setPreferredSize(new java.awt.Dimension(400, 30));
+		labelSngl.setPreferredSize(new java.awt.Dimension(300, 30));
 
 		triggerModes.add(buttonExtF);
-		buttonExtF.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonExtF.setFont(deFont); // NOI18N
 		buttonExtF.setText("EXT ↓");
 		buttonExtF.setPreferredSize(new java.awt.Dimension(120, 30));
-		buttonExtF.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonExtFActionPerformed(evt);
-			}
-		});
+		buttonExtF.addActionListener(action);
 
 		triggerModes.add(buttonExtR);
-		buttonExtR.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonExtR.setFont(deFont); // NOI18N
 		buttonExtR.setText("EXT ↑");
 		buttonExtR.setPreferredSize(new java.awt.Dimension(120, 30));
-		buttonExtR.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonExtRActionPerformed(evt);
-			}
-		});
+		buttonExtR.addActionListener(action);
 
 		javax.swing.GroupLayout panelModesLayout = new javax.swing.GroupLayout(panelModes);
 		panelModes.setLayout(panelModesLayout);
@@ -900,14 +849,14 @@ public class DG645Gui extends javax.swing.JFrame {
 												.addComponent(buttonSngl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 												.addComponent(buttonLine, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 												.addGap(18, 18, 18)
-												.addGroup(panelModesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-														.addComponent(labelExt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(labelInt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(labelExt2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(labelSnglExt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(labelSnglExt2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(labelSngl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(labelLine, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+												.addGroup(panelModesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+														.addComponent(labelSngl, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(labelSnglExt2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(labelSnglExt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(labelExt2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(labelExt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(labelInt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(labelLine, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
 														.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panelModesLayout.setVerticalGroup(
@@ -946,6 +895,8 @@ public class DG645Gui extends javax.swing.JFrame {
 																				.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 
+		jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
 		javax.swing.GroupLayout panelTriggerLayout = new javax.swing.GroupLayout(panelTrigger);
 		panelTrigger.setLayout(panelTriggerLayout);
 		panelTriggerLayout.setHorizontalGroup(
@@ -953,77 +904,102 @@ public class DG645Gui extends javax.swing.JFrame {
 				.addGroup(panelTriggerLayout.createSequentialGroup()
 						.addContainerGap()
 						.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(panelModes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addGroup(panelTriggerLayout.createSequentialGroup()
+										.addGap(10, 10, 10)
 										.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 												.addComponent(labelTrigThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addComponent(labelAdvTrig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 												.addComponent(labelTrigRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 												.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-														.addComponent(buttonTrigOff, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addComponent(txtTrigRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(buttonTrigOn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addGroup(panelTriggerLayout.createSequentialGroup()
-																.addComponent(labelHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-																.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(txtHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-																.addComponent(txtTrigThres, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)))
-																.addComponent(panelModes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-																.addContainerGap(103, Short.MAX_VALUE))
-																.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTriggerLayout.createSequentialGroup()
-																		.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																		.addComponent(panelPresConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-																		.addGap(24, 24, 24))
+														.addComponent(txtTrigThres, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))))
+														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+														.addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+														.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+																.addGroup(panelTriggerLayout.createSequentialGroup()
+																		.addComponent(labelAdvTrig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																		.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+																		.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+																				.addComponent(buttonTrigOff, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																				.addComponent(buttonTrigOn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																				.addGroup(panelTriggerLayout.createSequentialGroup()
+																						.addComponent(labelHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+																						.addComponent(txtHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+																						.addComponent(panelPresConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+																						.addContainerGap(98, Short.MAX_VALUE))
 		);
 		panelTriggerLayout.setVerticalGroup(
 				panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(panelTriggerLayout.createSequentialGroup()
 						.addContainerGap()
-						.addComponent(panelModes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addGap(12, 12, 12)
-						.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-								.addComponent(labelTrigRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addComponent(txtTrigRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-										.addComponent(labelTrigThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addComponent(txtTrigThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-										.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(labelAdvTrig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addComponent(buttonTrigOn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-												.addComponent(buttonTrigOff, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addGap(18, 18, 18)
-												.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(labelHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(txtHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+						.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(jSeparator1)
+								.addGroup(panelTriggerLayout.createSequentialGroup()
+										.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+												.addGroup(panelTriggerLayout.createSequentialGroup()
+														.addComponent(buttonTrigOn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+														.addComponent(buttonTrigOff, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addGap(18, 18, 18)
-														.addComponent(panelPresConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addContainerGap(119, Short.MAX_VALUE))
+														.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+																.addComponent(labelHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																.addComponent(txtHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+																.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+																.addComponent(panelPresConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+																.addComponent(labelAdvTrig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																.addGroup(panelTriggerLayout.createSequentialGroup()
+																		.addComponent(panelModes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																		.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+																		.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+																				.addComponent(labelTrigRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																				.addComponent(txtTrigRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+																				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+																				.addGroup(panelTriggerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+																						.addComponent(labelTrigThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																						.addComponent(txtTrigThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+																						.addGap(0, 0, Short.MAX_VALUE)))
+																						.addContainerGap())
 		);
-
-		jTabMenus.addTab("Trigger", panelTrigger);
+		
+		return panelTrigger;
+	}
+	
+	private javax.swing.JPanel burstPanel()
+	{
+		//initializing necessary variables
+		panelBurst = new javax.swing.JPanel();
+		
+		burstOnOff = new javax.swing.ButtonGroup();
+		burstOutput = new javax.swing.ButtonGroup();
+		
+		buttonOn = new javax.swing.JRadioButton();
+		buttonOff = new javax.swing.JRadioButton();
+		buttonOutputAll = new javax.swing.JRadioButton();
+		buttonOutputFirst = new javax.swing.JRadioButton();
+		txtCNT = new javax.swing.JFormattedTextField();
+		txtPeriod = new javax.swing.JFormattedTextField();
+		txtDelay = new javax.swing.JFormattedTextField();
+		labelCNT = new javax.swing.JLabel();
+		labelPeriod = new javax.swing.JLabel();
+		labelDelay = new javax.swing.JLabel();
+		//end variable initialization
+		
+		panelBurst.setPreferredSize(new java.awt.Dimension(500, 500));
 
 		burstOnOff.add(buttonOn);
-		buttonOn.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonOn.setFont(deFont); // NOI18N
 		buttonOn.setText("On");
 		buttonOn.setPreferredSize(new java.awt.Dimension(60, 30));
-		buttonOn.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonOnActionPerformed(evt);
-			}
-		});
+		buttonOn.addActionListener(action);
 
 		burstOnOff.add(buttonOff);
-		buttonOff.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonOff.setFont(deFont); // NOI18N
 		buttonOff.setText("Off");
 		buttonOff.setPreferredSize(new java.awt.Dimension(60, 30));
-		buttonOff.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonOffActionPerformed(evt);
-			}
-		});
+		buttonOff.addActionListener(action);
 		mConn.writeLine("BURM?");
 		switch(Integer.parseInt(mConn.readLine())) {
 		case 0: burstOnOff.setSelected(buttonOff.getModel(), true);
@@ -1034,24 +1010,16 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 
 		burstOutput.add(buttonOutputAll);
-		buttonOutputAll.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonOutputAll.setFont(deFont); // NOI18N
 		buttonOutputAll.setText("T0 fire on all delay cycles of burst");
 		buttonOutputAll.setPreferredSize(new java.awt.Dimension(300, 30));
-		buttonOutputAll.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonOutputAllActionPerformed(evt);
-			}
-		});
+		buttonOutputAll.addActionListener(action);
 
 		burstOutput.add(buttonOutputFirst);
-		buttonOutputFirst.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonOutputFirst.setFont(deFont); // NOI18N
 		buttonOutputFirst.setText("T0 fire on first delay cycle of burst");
 		buttonOutputFirst.setPreferredSize(new java.awt.Dimension(300, 30));
-		buttonOutputFirst.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonOutputFirstActionPerformed(evt);
-			}
-		});
+		buttonOutputFirst.addActionListener(action);
 		mConn.writeLine("BURT?");
 		switch(Integer.parseInt(mConn.readLine())) {
 		case 0: burstOutput.setSelected(buttonOutputAll.getModel(), true);
@@ -1070,13 +1038,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtCNT.setText(temp);
 		txtCNT.setToolTipText("range 1 to 2^32 - 1");
-		txtCNT.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtCNT.setFont(deFont); // NOI18N
 		txtCNT.setPreferredSize(new java.awt.Dimension(50, 30));
-		txtCNT.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtCNTPropertyChange(evt);
-			}
-		});
+		txtCNT.addPropertyChangeListener(action);
 
 		mConn.writeLine("BURP?");
 		//temp = mConn.readLine();
@@ -1089,13 +1053,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtPeriod.setText(temp);
 		txtPeriod.setToolTipText("10ns resolution");
-		txtPeriod.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtPeriod.setFont(deFont); // NOI18N
 		txtPeriod.setPreferredSize(new java.awt.Dimension(50, 30));
-		txtPeriod.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtPeriodPropertyChange(evt);
-			}
-		});
+		txtPeriod.addPropertyChangeListener(action);
 
 		mConn.writeLine("BURD?");
 		//temp = mConn.readLine();
@@ -1108,23 +1068,19 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtDelay.setText(temp);
 		txtDelay.setToolTipText("5ps resolution");
-		txtDelay.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtDelay.setFont(deFont); // NOI18N
 		txtDelay.setPreferredSize(new java.awt.Dimension(100, 30));
-		txtDelay.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtDelayPropertyChange(evt);
-			}
-		});
+		txtDelay.addPropertyChangeListener(action);
 
-		labelCNT.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelCNT.setFont(deFont); // NOI18N
 		labelCNT.setText("CNT");
 		labelCNT.setPreferredSize(new java.awt.Dimension(50, 30));
 
-		labelPeriod.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelPeriod.setFont(deFont); // NOI18N
 		labelPeriod.setText("Period");
 		labelPeriod.setPreferredSize(new java.awt.Dimension(50, 30));
 
-		labelDelay.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelDelay.setFont(deFont); // NOI18N
 		labelDelay.setText("Delay");
 		labelDelay.setPreferredSize(new java.awt.Dimension(50, 30));
 
@@ -1132,8 +1088,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		panelBurst.setLayout(panelBurstLayout);
 		panelBurstLayout.setHorizontalGroup(
 				panelBurstLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBurstLayout.createSequentialGroup()
-						.addContainerGap(233, Short.MAX_VALUE)
+				.addGroup(panelBurstLayout.createSequentialGroup()
+						.addGap(64, 64, 64)
 						.addGroup(panelBurstLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 								.addComponent(buttonOutputAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addComponent(buttonOff, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1151,7 +1107,7 @@ public class DG645Gui extends javax.swing.JFrame {
 																.addComponent(txtCNT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 																.addComponent(txtPeriod, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
 																.addComponent(txtDelay, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))))
-																.addGap(144, 144, 144))
+																.addContainerGap(781, Short.MAX_VALUE))
 		);
 		panelBurstLayout.setVerticalGroup(
 				panelBurstLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1178,10 +1134,78 @@ public class DG645Gui extends javax.swing.JFrame {
 												.addComponent(labelDelay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 												.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
-
-		jTabMenus.addTab("Burst", panelBurst);
-
-		panelDelay.setPreferredSize(new java.awt.Dimension(350, 40));
+		
+		return panelBurst;
+	}
+	
+	private javax.swing.JPanel delayPanel()
+	{
+		//initializing necessary variables
+		panelDelay = new javax.swing.JPanel();
+		
+		labelChannel = new javax.swing.JLabel();
+		labelDelay2 = new javax.swing.JLabel();
+		jPanelT0 = new javax.swing.JPanel();
+		labelEqual = new javax.swing.JLabel();
+		labelT0 = new javax.swing.JLabel();
+		labelChannel0 = new javax.swing.JLabel();
+		labelT0val = new javax.swing.JLabel();
+		panelT1 = new javax.swing.JPanel();
+		labelChannel1 = new javax.swing.JLabel();
+		labelEqual1 = new javax.swing.JLabel();
+		labelT1 = new javax.swing.JLabel();
+		labelT1val = new javax.swing.JLabel();
+		panelA = new javax.swing.JPanel();
+		cboxChannelA = new javax.swing.JComboBox();
+		cboxPMA = new javax.swing.JComboBox();
+		labelEqualA = new javax.swing.JLabel();
+		labelA = new javax.swing.JLabel();
+		txtValA = new javax.swing.JFormattedTextField();
+		panelB = new javax.swing.JPanel();
+		cboxPMB = new javax.swing.JComboBox();
+		labelB = new javax.swing.JLabel();
+		labelEqualB = new javax.swing.JLabel();
+		txtValB = new javax.swing.JFormattedTextField();
+		cboxChannelB = new javax.swing.JComboBox();
+		panelC = new javax.swing.JPanel();
+		cboxChannelC = new javax.swing.JComboBox();
+		cboxPMC = new javax.swing.JComboBox();
+		labelC = new javax.swing.JLabel();
+		labelEqualC = new javax.swing.JLabel();
+		txtValC = new javax.swing.JFormattedTextField();
+		panelD = new javax.swing.JPanel();
+		cboxChannelD = new javax.swing.JComboBox();
+		cboxPMD = new javax.swing.JComboBox();
+		txtValD = new javax.swing.JFormattedTextField();
+		labelD = new javax.swing.JLabel();
+		labelEqualD = new javax.swing.JLabel();
+		panelE = new javax.swing.JPanel();
+		cboxChannelE = new javax.swing.JComboBox();
+		cboxPME = new javax.swing.JComboBox();
+		txtValE = new javax.swing.JFormattedTextField();
+		labelE = new javax.swing.JLabel();
+		labelEqualE = new javax.swing.JLabel();
+		panelF = new javax.swing.JPanel();
+		cboxChannelF = new javax.swing.JComboBox();
+		cboxPMF = new javax.swing.JComboBox();
+		labelF = new javax.swing.JLabel();
+		labelEqualF = new javax.swing.JLabel();
+		txtValF = new javax.swing.JFormattedTextField();
+		panelG = new javax.swing.JPanel();
+		cboxChannelG = new javax.swing.JComboBox();
+		cboxPMG = new javax.swing.JComboBox();
+		labelG = new javax.swing.JLabel();
+		labelEqualG = new javax.swing.JLabel();
+		txtValG = new javax.swing.JFormattedTextField();
+		panelH = new javax.swing.JPanel();
+		cboxChannelH = new javax.swing.JComboBox();
+		cboxPMH = new javax.swing.JComboBox();
+		txtValH = new javax.swing.JFormattedTextField();
+		labelH = new javax.swing.JLabel();
+		labelEqualH = new javax.swing.JLabel();
+		//end variable initialization
+		
+		panelDelay.setPreferredSize(new java.awt.Dimension(500, 500));
 
 		labelChannel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelChannel.setText("Channel");
@@ -1195,7 +1219,7 @@ public class DG645Gui extends javax.swing.JFrame {
 		jPanelT0.setPreferredSize(new java.awt.Dimension(500, 30));
 		jPanelT0.setRequestFocusEnabled(false);
 
-		labelEqual.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqual.setFont(deFont); // NOI18N
 		labelEqual.setText("=");
 		labelEqual.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -1204,14 +1228,14 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelT0.setText("T0");
 		labelT0.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		labelChannel0.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelChannel0.setFont(deFont); // NOI18N
 		labelChannel0.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelChannel0.setText("0");
 		labelChannel0.setPreferredSize(new java.awt.Dimension(55, 30));
 
 		mConn.writeLine("DLAY? 0");  
 		temp = mConn.readLine().substring(2);
-		labelT0val.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelT0val.setFont(deFont); // NOI18N
 		labelT0val.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelT0val.setText(temp);
 		labelT0val.setPreferredSize(new java.awt.Dimension(200, 30));
@@ -1244,12 +1268,12 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		panelT1.setPreferredSize(new java.awt.Dimension(500, 30));
 
-		labelChannel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelChannel1.setFont(deFont); // NOI18N
 		labelChannel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelChannel1.setText("0");
 		labelChannel1.setPreferredSize(new java.awt.Dimension(55, 30));
 
-		labelEqual1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqual1.setFont(deFont); // NOI18N
 		labelEqual1.setText("=");
 		labelEqual1.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -1260,7 +1284,7 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		mConn.writeLine("DLAY? 1");  
 		temp = mConn.readLine().substring(2);
-		labelT1val.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelT1val.setFont(deFont); // NOI18N
 		labelT1val.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelT1val.setText(temp);
 		labelT1val.setPreferredSize(new java.awt.Dimension(200, 30));
@@ -1301,33 +1325,25 @@ public class DG645Gui extends javax.swing.JFrame {
 		else
 			intemp = Integer.parseInt(temp) - 2;
 		//cboxChannelA.setSelectedIndex(Integer.parseInt(temp));
-		cboxChannelA.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxChannelA.setFont(deFont); // NOI18N
 		cboxChannelA.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "T0", "B", "C", "D", "E", "F", "G", "H" }));
 		cboxChannelA.setSelectedIndex(intemp);
 		cboxChannelA.setPreferredSize(new java.awt.Dimension(55, 30));
-		cboxChannelA.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxChannelAActionPerformed(evt);
-			}
-		});
-
+		cboxChannelA.addActionListener(action);
+		
 		mConn.writeLine("DLAY? 2");  
 		temp = mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
 			intemp = 1;
-		cboxPMA.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxPMA.setFont(deFont); // NOI18N
 		cboxPMA.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "+", "-" }));
 		cboxPMA.setSelectedIndex(intemp);
 		cboxPMA.setPreferredSize(new java.awt.Dimension(45, 30));
-		cboxPMA.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxPMAActionPerformed(evt);
-			}
-		});
+		cboxPMA.addActionListener(action);
 
-		labelEqualA.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqualA.setFont(deFont); // NOI18N
 		labelEqualA.setText("=");
 		labelEqualA.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -1345,13 +1361,9 @@ public class DG645Gui extends javax.swing.JFrame {
 			ex.printStackTrace();
 		}
 		txtValA.setText(temp);
-		txtValA.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtValA.setFont(deFont); // NOI18N
 		txtValA.setPreferredSize(new java.awt.Dimension(200, 30));
-		txtValA.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtValAPropertyChange(evt);
-			}
-		});
+		txtValA.addPropertyChangeListener(action);
 
 		javax.swing.GroupLayout panelALayout = new javax.swing.GroupLayout(panelA);
 		panelA.setLayout(panelALayout);
@@ -1389,22 +1401,18 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = 0;
 		else
 			intemp = 1;
-		cboxPMB.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxPMB.setFont(deFont); // NOI18N
 		cboxPMB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "+", "-" }));
 		cboxPMB.setSelectedIndex(intemp);
 		cboxPMB.setPreferredSize(new java.awt.Dimension(45, 30));
-		cboxPMB.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxPMBActionPerformed(evt);
-			}
-		});
+		cboxPMB.addActionListener(action);
 
 		labelB.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelB.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelB.setText("B");
 		labelB.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		labelEqualB.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqualB.setFont(deFont); // NOI18N
 		labelEqualB.setText("=");
 		labelEqualB.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -1417,13 +1425,9 @@ public class DG645Gui extends javax.swing.JFrame {
 			ex.printStackTrace();
 		}
 		txtValB.setText(temp);
-		txtValB.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtValB.setFont(deFont); // NOI18N
 		txtValB.setPreferredSize(new java.awt.Dimension(200, 30));
-		txtValB.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtValBPropertyChange(evt);
-			}
-		});
+		txtValB.addPropertyChangeListener(action);
 
 		mConn.writeLine("DLAY? 3");
 		temp = mConn.readLine().substring(0,1);
@@ -1437,15 +1441,11 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = intemp - 1;
 		else
 			intemp = intemp - 2;
-		cboxChannelB.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxChannelB.setFont(deFont); // NOI18N
 		cboxChannelB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "T0", "A", "C", "D", "E", "F", "G", "H" }));
 		cboxChannelB.setSelectedIndex(intemp);
 		cboxChannelB.setPreferredSize(new java.awt.Dimension(55, 30));
-		cboxChannelB.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxChannelBActionPerformed(evt);
-			}
-		});
+		cboxChannelB.addActionListener(action);
 
 		javax.swing.GroupLayout panelBLayout = new javax.swing.GroupLayout(panelB);
 		panelB.setLayout(panelBLayout);
@@ -1489,15 +1489,11 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = intemp - 1;
 		else
 			intemp = intemp - 2;
-		cboxChannelC.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxChannelC.setFont(deFont); // NOI18N
 		cboxChannelC.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "T0", "A", "B", "D", "E", "F", "G", "H" }));
 		cboxChannelC.setSelectedIndex(intemp);
 		cboxChannelC.setPreferredSize(new java.awt.Dimension(55, 30));
-		cboxChannelC.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxChannelCActionPerformed(evt);
-			}
-		});
+		cboxChannelC.addActionListener(action);
 
 		mConn.writeLine("DLAY? 4");  
 		temp = mConn.readLine().substring(2,3);  
@@ -1505,22 +1501,18 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = 0;
 		else
 			intemp = 1;
-		cboxPMC.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxPMC.setFont(deFont); // NOI18N
 		cboxPMC.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "+", "-" }));
 		cboxPMC.setSelectedIndex(intemp);
 		cboxPMC.setPreferredSize(new java.awt.Dimension(45, 30));
-		cboxPMC.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxPMCActionPerformed(evt);
-			}
-		});
+		cboxPMC.addActionListener(action);
 
 		labelC.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelC.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelC.setText("C");
 		labelC.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		labelEqualC.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqualC.setFont(deFont); // NOI18N
 		labelEqualC.setText("=");
 		labelEqualC.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -1533,13 +1525,10 @@ public class DG645Gui extends javax.swing.JFrame {
 			ex.printStackTrace();
 		}
 		txtValC.setText(temp);
-		txtValC.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtValC.setFont(deFont); // NOI18N
 		txtValC.setPreferredSize(new java.awt.Dimension(200, 30));
-		txtValC.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtValCPropertyChange(evt);
-			}
-		});
+		txtValC.addPropertyChangeListener(action);
+		
 
 		javax.swing.GroupLayout panelCLayout = new javax.swing.GroupLayout(panelC);
 		panelC.setLayout(panelCLayout);
@@ -1582,15 +1571,12 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = intemp - 1;
 		else
 			intemp = intemp - 2;
-		cboxChannelD.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxChannelD.setFont(deFont); // NOI18N
 		cboxChannelD.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "T0", "A", "B", "C", "E", "F", "G", "H" }));
 		cboxChannelD.setSelectedIndex(intemp);
 		cboxChannelD.setPreferredSize(new java.awt.Dimension(55, 30));
-		cboxChannelD.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxChannelDActionPerformed(evt);
-			}
-		});
+		cboxChannelD.addActionListener(action);
+		
 
 		mConn.writeLine("DLAY? 5");  
 		temp = mConn.readLine().substring(2,3);  
@@ -1598,16 +1584,12 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = 0;
 		else
 			intemp = 1;
-		cboxPMD.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxPMD.setFont(deFont); // NOI18N
 		cboxPMD.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "+", "-" }));
 		cboxPMD.setSelectedIndex(intemp);
 		cboxPMD.setPreferredSize(new java.awt.Dimension(45, 30));
-		cboxPMD.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxPMDActionPerformed(evt);
-			}
-		});
-
+		cboxPMD.addActionListener(action);
+		
 		mConn.writeLine("DLAY? 5");  
 		temp = mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
@@ -1617,20 +1599,16 @@ public class DG645Gui extends javax.swing.JFrame {
 			ex.printStackTrace();
 		}
 		txtValD.setText(temp);
-		txtValD.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtValD.setFont(deFont); // NOI18N
 		txtValD.setPreferredSize(new java.awt.Dimension(200, 30));
-		txtValD.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtValDPropertyChange(evt);
-			}
-		});
-
+		txtValD.addPropertyChangeListener(action);
+		
 		labelD.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelD.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelD.setText("D");
 		labelD.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		labelEqualD.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqualD.setFont(deFont); // NOI18N
 		labelEqualD.setText("=");
 		labelEqualD.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -1676,15 +1654,12 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = intemp - 1;
 		else
 			intemp = intemp - 2;
-		cboxChannelE.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxChannelE.setFont(deFont); // NOI18N
 		cboxChannelE.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "T0", "A", "B", "C", "D", "F", "G", "H" }));
 		cboxChannelE.setSelectedIndex(intemp);
 		cboxChannelE.setPreferredSize(new java.awt.Dimension(55, 30));
-		cboxChannelE.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxChannelEActionPerformed(evt);
-			}
-		});
+		cboxChannelE.addActionListener(action);
+		
 
 		mConn.writeLine("DLAY? 6");  
 		temp = mConn.readLine().substring(2,3);  
@@ -1692,15 +1667,12 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = 0;
 		else
 			intemp = 1;
-		cboxPME.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxPME.setFont(deFont); // NOI18N
 		cboxPME.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "+", "-" }));
 		cboxPME.setSelectedIndex(intemp);
 		cboxPME.setPreferredSize(new java.awt.Dimension(45, 30));
-		cboxPME.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxPMEActionPerformed(evt);
-			}
-		});
+		cboxPME.addActionListener(action);
+		
 
 		mConn.writeLine("DLAY? 6");  
 		temp = mConn.readLine().substring(3);  
@@ -1711,20 +1683,17 @@ public class DG645Gui extends javax.swing.JFrame {
 			ex.printStackTrace();
 		}
 		txtValE.setText(temp);
-		txtValE.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtValE.setFont(deFont); // NOI18N
 		txtValE.setPreferredSize(new java.awt.Dimension(200, 30));
-		txtValE.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtValEPropertyChange(evt);
-			}
-		});
+		txtValE.addPropertyChangeListener(action);
+		
 
 		labelE.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelE.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelE.setText("E");
 		labelE.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		labelEqualE.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqualE.setFont(deFont); // NOI18N
 		labelEqualE.setText("=");
 		labelEqualE.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -1771,15 +1740,12 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = intemp - 1;
 		else
 			intemp = intemp - 2;
-		cboxChannelF.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxChannelF.setFont(deFont); // NOI18N
 		cboxChannelF.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "T0", "A", "B", "C", "D", "E", "G", "H" }));
 		cboxChannelF.setSelectedIndex(intemp);
 		cboxChannelF.setPreferredSize(new java.awt.Dimension(55, 30));
-		cboxChannelF.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxChannelFActionPerformed(evt);
-			}
-		});
+		cboxChannelF.addActionListener(action);
+		
 
 		mConn.writeLine("DLAY? 7");  
 		temp = mConn.readLine().substring(2,3);  
@@ -1787,22 +1753,19 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = 0;
 		else
 			intemp = 1;
-		cboxPMF.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxPMF.setFont(deFont); // NOI18N
 		cboxPMF.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "+", "-" }));
 		cboxPMF.setSelectedIndex(intemp);
 		cboxPMF.setPreferredSize(new java.awt.Dimension(45, 30));
-		cboxPMF.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxPMFActionPerformed(evt);
-			}
-		});
+		cboxPMF.addActionListener(action);
+		
 
 		labelF.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelF.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelF.setText("F");
 		labelF.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		labelEqualF.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqualF.setFont(deFont); // NOI18N
 		labelEqualF.setText("=");
 		labelEqualF.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -1815,13 +1778,10 @@ public class DG645Gui extends javax.swing.JFrame {
 			ex.printStackTrace();
 		}
 		txtValF.setText(temp);
-		txtValF.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtValF.setFont(deFont); // NOI18N
 		txtValF.setPreferredSize(new java.awt.Dimension(200, 30));
-		txtValF.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtValFPropertyChange(evt);
-			}
-		});
+		txtValF.addPropertyChangeListener(action);
+		
 
 		javax.swing.GroupLayout panelFLayout = new javax.swing.GroupLayout(panelF);
 		panelF.setLayout(panelFLayout);
@@ -1865,15 +1825,12 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = intemp - 1;
 		else
 			intemp = intemp - 2;
-		cboxChannelG.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxChannelG.setFont(deFont); // NOI18N
 		cboxChannelG.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "T0", "A", "B", "C", "D", "E", "F", "H" }));
 		cboxChannelG.setSelectedIndex(intemp);
 		cboxChannelG.setPreferredSize(new java.awt.Dimension(55, 30));
-		cboxChannelG.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxChannelGActionPerformed(evt);
-			}
-		});
+		cboxChannelG.addActionListener(action);
+		
 
 		mConn.writeLine("DLAY? 8");  
 		temp = mConn.readLine().substring(2,3);  
@@ -1881,22 +1838,19 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = 0;
 		else
 			intemp = 1;
-		cboxPMG.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxPMG.setFont(deFont); // NOI18N
 		cboxPMG.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "+", "-" }));
 		cboxPMG.setSelectedIndex(intemp);
 		cboxPMG.setPreferredSize(new java.awt.Dimension(45, 30));
-		cboxPMG.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxPMGActionPerformed(evt);
-			}
-		});
+		cboxPMG.addActionListener(action);
+		
 
 		labelG.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelG.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelG.setText("G");
 		labelG.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		labelEqualG.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqualG.setFont(deFont); // NOI18N
 		labelEqualG.setText("=");
 		labelEqualG.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -1909,13 +1863,9 @@ public class DG645Gui extends javax.swing.JFrame {
 			ex.printStackTrace();
 		}
 		txtValG.setText(temp);
-		txtValG.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtValG.setFont(deFont); // NOI18N
 		txtValG.setPreferredSize(new java.awt.Dimension(200, 30));
-		txtValG.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtValGPropertyChange(evt);
-			}
-		});
+		txtValG.addPropertyChangeListener(action);
 
 		javax.swing.GroupLayout panelGLayout = new javax.swing.GroupLayout(panelG);
 		panelG.setLayout(panelGLayout);
@@ -1959,32 +1909,24 @@ public class DG645Gui extends javax.swing.JFrame {
 			intemp = intemp - 1;
 		else
 			intemp = intemp - 2;
-		cboxChannelH.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxChannelH.setFont(deFont); // NOI18N
 		cboxChannelH.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "T0", "A", "B", "C", "D", "E", "F", "G" }));
 		cboxChannelH.setSelectedIndex(intemp);
 		cboxChannelH.setPreferredSize(new java.awt.Dimension(55, 30));
-		cboxChannelH.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxChannelHActionPerformed(evt);
-			}
-		});
-
+		cboxChannelH.addActionListener(action);
+		
 		mConn.writeLine("DLAY? 9");  
 		temp = mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
 			intemp = 1;
-		cboxPMH.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		cboxPMH.setFont(deFont); // NOI18N
 		cboxPMH.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "+", "-" }));
 		cboxPMH.setSelectedIndex(intemp);
 		cboxPMH.setPreferredSize(new java.awt.Dimension(45, 30));
-		cboxPMH.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxPMHActionPerformed(evt);
-			}
-		});
-
+		cboxPMH.addActionListener(action);
+		
 		mConn.writeLine("DLAY? 9");  
 		temp = mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
@@ -1994,20 +1936,17 @@ public class DG645Gui extends javax.swing.JFrame {
 			ex.printStackTrace();
 		}
 		txtValH.setText(temp);
-		txtValH.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtValH.setFont(deFont); // NOI18N
 		txtValH.setPreferredSize(new java.awt.Dimension(200, 30));
-		txtValH.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtValHPropertyChange(evt);
-			}
-		});
+		txtValH.addPropertyChangeListener(action);
+		
 
 		labelH.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		labelH.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelH.setText("H");
 		labelH.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		labelEqualH.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelEqualH.setFont(deFont); // NOI18N
 		labelEqualH.setText("=");
 		labelEqualH.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -2043,7 +1982,7 @@ public class DG645Gui extends javax.swing.JFrame {
 		panelDelayLayout.setHorizontalGroup(
 				panelDelayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(panelDelayLayout.createSequentialGroup()
-						.addGap(33, 33, 33)
+						.addContainerGap()
 						.addGroup(panelDelayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 								.addComponent(panelB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addComponent(panelH, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2060,7 +1999,7 @@ public class DG645Gui extends javax.swing.JFrame {
 										.addComponent(panelC, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 										.addComponent(panelF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 										.addComponent(panelG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addContainerGap(144, Short.MAX_VALUE))
+										.addContainerGap(633, Short.MAX_VALUE))
 		);
 		panelDelayLayout.setVerticalGroup(
 				panelDelayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2089,32 +2028,52 @@ public class DG645Gui extends javax.swing.JFrame {
 								.addComponent(panelG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 								.addComponent(panelH, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addContainerGap(559, Short.MAX_VALUE))
+								.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
-
-		jTabMenus.addTab("Delay", panelDelay);
+		
+		return panelDelay;
+	}
+	
+	private javax.swing.JPanel levelPanel()
+	{
+		//initializing necessary variables
+		panelLevel = new javax.swing.JPanel();
+		
+		levelPolarity = new javax.swing.ButtonGroup();
+		
+		cboxLevel = new javax.swing.JComboBox();
+		labelOffset = new javax.swing.JLabel();
+		labelAmp = new javax.swing.JLabel();
+		labelPolarity = new javax.swing.JLabel();
+		txtOffset = new javax.swing.JFormattedTextField();
+		labelv = new javax.swing.JLabel();
+		txtAmp = new javax.swing.JFormattedTextField();
+		labelv2 = new javax.swing.JLabel();
+		buttonPos = new javax.swing.JRadioButton();
+		buttonNeg = new javax.swing.JRadioButton();
+		//end variable initialization
+		
+		
+		panelLevel.setPreferredSize(new java.awt.Dimension(500, 500));
 
 		cboxLevel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
 		cboxLevel.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Output T0", "Output AB", "Output CD", "Output EF", "Output GH" }));
 		cboxLevel.setPreferredSize(new java.awt.Dimension(150, 30));
-		cboxLevel.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cboxLevelActionPerformed(evt);
-			}
-		});
+		cboxLevel.addActionListener(action);
+			
 
-		labelOffset.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelOffset.setFont(deFont); // NOI18N
 		labelOffset.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelOffset.setText("Offset");
 		labelOffset.setPreferredSize(new java.awt.Dimension(100, 30));
 		labelOffset.setRequestFocusEnabled(false);
 
-		labelAmp.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelAmp.setFont(deFont); // NOI18N
 		labelAmp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelAmp.setText("Amplitude");
 		labelAmp.setPreferredSize(new java.awt.Dimension(100, 30));
 
-		labelPolarity.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelPolarity.setFont(deFont); // NOI18N
 		labelPolarity.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelPolarity.setText("Polarity");
 		labelPolarity.setPreferredSize(new java.awt.Dimension(100, 30));
@@ -2128,15 +2087,12 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtOffset.setText(temp);
 		txtOffset.setToolTipText("ranging over +- 2.0 V");
-		txtOffset.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtOffset.setFont(deFont); // NOI18N
 		txtOffset.setPreferredSize(new java.awt.Dimension(60, 30));
-		txtOffset.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtOffsetPropertyChange(evt);
-			}
-		});
+		txtOffset.addPropertyChangeListener(action);
+		
 
-		labelv.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelv.setFont(deFont); // NOI18N
 		labelv.setText("V");
 		labelv.setPreferredSize(new java.awt.Dimension(15, 30));
 
@@ -2150,37 +2106,26 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		txtAmp.setText(temp);
 		txtAmp.setToolTipText("ranging over 0.50V to 4.00V");
-		txtAmp.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		txtAmp.setFont(deFont); // NOI18N
 		txtAmp.setPreferredSize(new java.awt.Dimension(60, 30));
-		txtAmp.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			public void propertyChange(java.beans.PropertyChangeEvent evt) {
-				txtAmpPropertyChange(evt);
-			}
-		});
+		txtAmp.addPropertyChangeListener(action);
+		
 
-		labelv2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		labelv2.setFont(deFont); // NOI18N
 		labelv2.setText("V");
 		labelv2.setPreferredSize(new java.awt.Dimension(15, 30));
 
 		levelPolarity.add(buttonPos);
-		buttonPos.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonPos.setFont(deFont); // NOI18N
 		buttonPos.setText("Positive");
 		buttonPos.setPreferredSize(new java.awt.Dimension(100, 30));
-		buttonPos.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonPosActionPerformed(evt);
-			}
-		});
+		buttonPos.addActionListener(action);
 
 		levelPolarity.add(buttonNeg);
-		buttonNeg.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		buttonNeg.setFont(deFont); // NOI18N
 		buttonNeg.setText("Negative");
 		buttonNeg.setPreferredSize(new java.awt.Dimension(100, 30));
-		buttonNeg.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonNegActionPerformed(evt);
-			}
-		});
+		buttonNeg.addActionListener(action);
 		mConn.writeLine("LPOL?" + cboxLevel.getSelectedIndex());
 		switch(Integer.parseInt(mConn.readLine())) {
 		case 0: levelPolarity.setSelected(buttonNeg.getModel(), true);
@@ -2194,8 +2139,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		panelLevel.setLayout(panelLevelLayout);
 		panelLevelLayout.setHorizontalGroup(
 				panelLevelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelLevelLayout.createSequentialGroup()
-						.addContainerGap(239, Short.MAX_VALUE)
+				.addGroup(panelLevelLayout.createSequentialGroup()
+						.addGap(159, 159, 159)
 						.addGroup(panelLevelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 								.addComponent(cboxLevel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addGroup(panelLevelLayout.createSequentialGroup()
@@ -2216,12 +2161,12 @@ public class DG645Gui extends javax.swing.JFrame {
 																		.addComponent(txtOffset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 																		.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 																		.addComponent(labelv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-																		.addGap(211, 211, 211))
+																		.addContainerGap(759, Short.MAX_VALUE))
 		);
 		panelLevelLayout.setVerticalGroup(
 				panelLevelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(panelLevelLayout.createSequentialGroup()
-						.addGap(36, 36, 36)
+						.addContainerGap()
 						.addComponent(cboxLevel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
 						.addGap(18, 18, 18)
 						.addGroup(panelLevelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -2239,756 +2184,25 @@ public class DG645Gui extends javax.swing.JFrame {
 												.addComponent(buttonPos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 												.addComponent(buttonNeg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addContainerGap(755, Short.MAX_VALUE))
+												.addContainerGap(249, Short.MAX_VALUE))
 		);
-
-		jTabMenus.addTab("Level", panelLevel);
-
-		javax.swing.GroupLayout panelMainLayout = new javax.swing.GroupLayout(panelMain);
-		panelMain.setLayout(panelMainLayout);
-		panelMainLayout.setHorizontalGroup(
-				panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(panelMainLayout.createSequentialGroup()
-						.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(jTabMenus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-		);
-		panelMainLayout.setVerticalGroup(
-				panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelMainLayout.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(jTabMenus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-
-		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-		getContentPane().setLayout(layout);
-		layout.setHorizontalGroup(
-				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addComponent(panelMain, javax.swing.GroupLayout.PREFERRED_SIZE, 762, javax.swing.GroupLayout.PREFERRED_SIZE)
-		);
-		layout.setVerticalGroup(
-				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(layout.createSequentialGroup()
-						.addComponent(panelMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addGap(0, 0, Short.MAX_VALUE))
-		);
-
-		pack();
-	}// </editor-fold>                        
-
-	private void buttonOutputFirstActionPerformed(java.awt.event.ActionEvent evt) {                                                  
-		mConn.writeLine("BURT 1");
-	}                                                 
-
-	private void txtGHpresPropertyChange(java.beans.PropertyChangeEvent evt) {                                         
-
-		try{
-			mConn.writeLine("PRES 4," + txtGHpres.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-
-	}                                        
-
-	private void txtEFpresPropertyChange(java.beans.PropertyChangeEvent evt) {                                         
-		try{
-			mConn.writeLine("PRES 3," + txtEFpres.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-	}                                        
-
-	private void txtCDpresPropertyChange(java.beans.PropertyChangeEvent evt) {                                         
-		try{
-			mConn.writeLine("PRES 2," + txtCDpres.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-	}                                        
-
-	private void txtABpresPropertyChange(java.beans.PropertyChangeEvent evt) {                                         
-		try{
-			mConn.writeLine("PRES 1," + txtABpres.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-	}                                        
-
-	private void txtTrigPresPropertyChange(java.beans.PropertyChangeEvent evt) {                                           
-		try{
-			mConn.writeLine("PRES 0," + txtTrigPres.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
+		
+		return panelLevel;
+		
+	}
+	
+	//ACTIONS - MOVE TO OWN CLASS LATER
+	private void menuSavePopupMousePressed(java.awt.event.MouseEvent evt) {                                           
+		// TODO add your handling code here:
 	}                                          
 
-	private void txtHoldPropertyChange(java.beans.PropertyChangeEvent evt) {                                       
-		try{
-			mConn.writeLine("HOLD " + txtHold.getValue().toString());
-		}catch(Exception e){
-
-		}
-	}                                      
-
-	private void buttonTrigOffActionPerformed(java.awt.event.ActionEvent evt) {                                              
-		mConn.writeLine("ADVT 0");
-	}                                             
-
-	private void buttonTrigOnActionPerformed(java.awt.event.ActionEvent evt) {                                             
-		mConn.writeLine("ADVT 1");
-	}                                            
-
-	private void txtTrigRatePropertyChange(java.beans.PropertyChangeEvent evt) {                                           
-
-		try{
-			mConn.writeLine("TRAT " + txtTrigRate.getValue().toString());
-		}catch(Exception e){
-
-		}
-	}                                          
-
-	private void buttonLineActionPerformed(java.awt.event.ActionEvent evt) {                                           
-		mConn.writeLine("TSRC 6");
-	}                                          
-
-	private void buttonSnglActionPerformed(java.awt.event.ActionEvent evt) {                                           
-		mConn.writeLine("TSRC 5");
-	}                                          
-
-	private void buttonSnglExtFActionPerformed(java.awt.event.ActionEvent evt) {                                               
-		mConn.writeLine("TSRC 4");
-	}                                              
-
-	private void buttonSnglExtRActionPerformed(java.awt.event.ActionEvent evt) {                                               
-		mConn.writeLine("TSRC 3");
-	}                                              
-
-	private void buttonExtFActionPerformed(java.awt.event.ActionEvent evt) {                                           
-		mConn.writeLine("TSRC 2");
-	}                                          
-
-	private void buttonExtRActionPerformed(java.awt.event.ActionEvent evt) {                                           
-		mConn.writeLine("TSRC 1");
-	}                                          
-
-	private void buttonIntActionPerformed(java.awt.event.ActionEvent evt) {                                          
-		mConn.writeLine("TSRC 0");
-	}                                         
-
-	private void txtTrigThresPropertyChange(java.beans.PropertyChangeEvent evt) {                                            
-		try{
-			mConn.writeLine("TLVL," + txtTrigThres.getValue().toString());
-		}catch(Exception e){
-
-		}
+	private void menuSavePopupMouseReleased(java.awt.event.MouseEvent evt) {                                            
+		// TODO add your handling code here:
 	}                                           
 
-	private void txtABphasePropertyChange(java.beans.PropertyChangeEvent evt) {                                          
-		try{
-			mConn.writeLine("PHAS 0," + txtTrigPres.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-
-	}                                         
-
-	private void txtCDphasePropertyChange(java.beans.PropertyChangeEvent evt) {                                          
-		try{
-			mConn.writeLine("PHAS 2," + txtTrigPres.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-	}                                         
-
-	private void txtEFphasePropertyChange(java.beans.PropertyChangeEvent evt) {                                          
-		try{
-			mConn.writeLine("PHAS 3," + txtTrigPres.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-	}                                         
-
-	private void txtGHphasePropertyChange(java.beans.PropertyChangeEvent evt) {                                          
-		try{
-			mConn.writeLine("PHAS 4," + txtTrigPres.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-	}                                         
-
-	private void buttonOnActionPerformed(java.awt.event.ActionEvent evt) {                                         
-		mConn.writeLine("BURM 1");
-	}                                        
-
-	private void buttonOffActionPerformed(java.awt.event.ActionEvent evt) {                                          
-		mConn.writeLine("BURM 0");
-	}                                         
-
-	private void buttonOutputAllActionPerformed(java.awt.event.ActionEvent evt) {                                                
-		mConn.writeLine("BURT 0");
-	}                                               
-
-	private void txtCNTPropertyChange(java.beans.PropertyChangeEvent evt) {                                      
-
-		try{
-			mConn.writeLine("BURC " + txtCNT.getValue().toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-	}                                     
-
-	private void txtPeriodPropertyChange(java.beans.PropertyChangeEvent evt) {                                         
-		try{
-			mConn.writeLine("BURP " + txtPeriod.getValue());//.toString().replace(",", ""));
-		}catch(Exception e){
-
-		}
-	}                                        
-
-	private void txtDelayPropertyChange(java.beans.PropertyChangeEvent evt) {                                        
-		try{
-			mConn.writeLine("BURD " + txtDelay.getValue());//.toString())//.replace(",", ""));
-
-			mConn.writeLine("BURD?");
-
-			temp = mConn.readLine().substring(1);
-			temp = ("0.000000000000" + temp).substring(temp.length());
-
-			txtDelay.setText(temp);
-		}catch(Exception e){
-
-		}
-	}                                       
-
-	private void cboxChannelAActionPerformed(java.awt.event.ActionEvent evt) {                                             
-		try{
-			int index = cboxChannelA.getSelectedIndex();
-			if(index < 1)
-				mConn.writeLine("LINK 2," + index);
-			else
-				mConn.writeLine("LINK 2," + (index+2));
-
-			checkError();
-
-			updateDelays("2");
-
-		}catch(Exception e){
-
-		}
-	}                                            
-
-	private void cboxChannelBActionPerformed(java.awt.event.ActionEvent evt) {                                             
-		try{
-			int index = cboxChannelB.getSelectedIndex();
-			if(index == 0)
-				mConn.writeLine("Link 3," + index);
-			else if(index < 2)
-				mConn.writeLine("LINK 3," + (index+1));
-			else
-				mConn.writeLine("LINK 3," + (index+2));
-
-			checkError();
-
-			updateDelays("3");
-		}catch(Exception e){
-
-		}
-	}                                            
-
-	private void cboxChannelCActionPerformed(java.awt.event.ActionEvent evt) {                                             
-		try{
-			int index = cboxChannelC.getSelectedIndex();
-			if(index == 0)
-				mConn.writeLine("LINK 4," + index);
-			else if(index < 3)
-				mConn.writeLine("LINK 4," + (index+1));
-			else
-				mConn.writeLine("LINK 4," + (index+2));
-
-			checkError();    
-			updateDelays("4");
-		}catch(Exception e){
-
-		}
-	}                                            
-
-	private void cboxChannelDActionPerformed(java.awt.event.ActionEvent evt) {                                             
-		try{
-			int index = cboxChannelD.getSelectedIndex();
-			if(index == 0)
-				mConn.writeLine("LINK 5," + index);
-			else if(index < 4)
-				mConn.writeLine("LINK 5," + (index+1));
-			else
-				mConn.writeLine("LINK 5," + (index+2));
-
-			checkError();
-			updateDelays("5");
-		}catch(Exception e){
-
-		}
-	}                                            
-
-	private void cboxChannelEActionPerformed(java.awt.event.ActionEvent evt) {                                             
-		try{
-			int index = cboxChannelE.getSelectedIndex();
-			if(index == 0)
-				mConn.writeLine("LINK 6," + index);
-			else if(index < 5)
-				mConn.writeLine("LINK 6," + (index+1));
-			else
-				mConn.writeLine("LINK 6," + (index+2));
-
-			checkError();
-			updateDelays("6");
-		}catch(Exception e){
-
-		}
-	}                                            
-
-	private void cboxChannelFActionPerformed(java.awt.event.ActionEvent evt) {                                             
-		try{
-			int index = cboxChannelF.getSelectedIndex();
-			if(index == 0)
-				mConn.writeLine("LINK 7," + index);
-			else if(index < 6)
-				mConn.writeLine("LINK 7," + (index+1));
-			else
-				mConn.writeLine("LINK 7," + (index+2));
-
-			checkError();
-			updateDelays("7");
-		}catch(Exception e){
-
-		}
-	}                                            
-
-	private void cboxChannelGActionPerformed(java.awt.event.ActionEvent evt) {                                             
-		try{
-			int index = cboxChannelG.getSelectedIndex();
-			if(index == 0)
-				mConn.writeLine("LINK 8," + index);
-			else if(index < 7)
-				mConn.writeLine("LINK 8," + (index+1));
-			else
-				mConn.writeLine("LINK 8," + (index+2));
-
-			checkError();
-			updateDelays("8");
-		}catch(Exception e){
-
-		}
-	}                                            
-
-	private void cboxChannelHActionPerformed(java.awt.event.ActionEvent evt) {                                             
-		try{
-			int index = cboxChannelH.getSelectedIndex();
-			if(index == 0)
-				mConn.writeLine("LINK 9," + index);
-			else if(index < 9)
-				mConn.writeLine("LINK 9," + (index+1));
-			else
-				mConn.writeLine("LINK 9," + (index+2));
-
-			checkError();
-			updateDelays("9");
-		}catch(Exception e){
-
-		}
-	}                                            
-
-	private void cboxPMAActionPerformed(java.awt.event.ActionEvent evt) {                                        
-		try{
-			mConn.writeLine("DLAY? 2");
-			String current = mConn.readLine();
-			String replace = current.substring(0, 2);
-
-			int index = cboxPMA.getSelectedIndex();
-			if(index == 0)
-				replace = replace + "+";
-			else
-				replace = replace + "-";
-
-			replace = replace + current.substring(3);
-
-			mConn.writeLine("DLAY 2," + replace);
-
-			updateT1();
-			checkError();
-		}catch(Exception e){
-
-		}
-	}                                       
-
-	private void cboxPMBActionPerformed(java.awt.event.ActionEvent evt) {                                        
-		try{
-
-			mConn.writeLine("DLAY? 3");
-			String current = mConn.readLine();
-			String replace = current.substring(0, 2);
-
-			int index = cboxPMB.getSelectedIndex();
-			if(index == 0)
-				replace = replace + "+";
-			else
-				replace = replace + "-";
-
-			replace = replace + current.substring(3);
-
-			mConn.writeLine("DLAY 3," + replace);
-
-
-			updateT1();
-			checkError();  
-		}catch(Exception e){
-
-		}
-	}                                       
-
-	private void cboxPMCActionPerformed(java.awt.event.ActionEvent evt) {                                        
-		try{
-
-			mConn.writeLine("DLAY? 4");
-			String current = mConn.readLine();
-			String replace = current.substring(0, 2);
-
-			int index = cboxPMC.getSelectedIndex();
-			if(index == 0)
-				replace = replace + "+";
-			else
-				replace = replace + "-";
-
-			replace = replace + current.substring(3);
-
-			mConn.writeLine("DLAY 4," + replace);
-
-
-			updateT1();
-			checkError();  
-		}catch(Exception e){
-
-		}
-	}                                       
-
-	private void cboxPMDActionPerformed(java.awt.event.ActionEvent evt) {                                        
-		try{
-
-			mConn.writeLine("DLAY? 5");
-			String current = mConn.readLine();
-			String replace = current.substring(0, 2);
-
-			int index = cboxPMD.getSelectedIndex();
-			if(index == 0)
-				replace = replace + "+";
-			else
-				replace = replace + "-";
-
-			replace = replace + current.substring(3);
-
-			mConn.writeLine("DLAY 5," + replace);
-
-
-			updateT1();
-			checkError();
-		}catch(Exception e){
-
-		}
-	}                                       
-
-	private void cboxPMEActionPerformed(java.awt.event.ActionEvent evt) {                                        
-		try{
-
-			mConn.writeLine("DLAY? 6");
-			String current = mConn.readLine();
-			String replace = current.substring(0, 2);
-
-			int index = cboxPME.getSelectedIndex();
-			if(index == 0)
-				replace = replace + "+";
-			else
-				replace = replace + "-";
-
-			replace = replace + current.substring(3);
-
-			mConn.writeLine("DLAY 6," + replace);
-
-
-			updateT1();
-			checkError();
-		}catch(Exception e){
-
-		}
-	}                                       
-
-	private void cboxPMFActionPerformed(java.awt.event.ActionEvent evt) {                                        
-		try{
-
-			mConn.writeLine("DLAY? 7");
-			String current = mConn.readLine();
-			String replace = current.substring(0, 2);
-
-			int index = cboxPMF.getSelectedIndex();
-			if(index == 0)
-				replace = replace + "+";
-			else
-				replace = replace + "-";
-
-			replace = replace + current.substring(3);
-
-			mConn.writeLine("DLAY 7," + replace);
-
-
-			updateT1();
-			checkError();  
-		}catch(Exception e){
-
-		}
-	}                                       
-
-	private void cboxPMGActionPerformed(java.awt.event.ActionEvent evt) {                                        
-		try{
-
-			mConn.writeLine("DLAY? 8");
-			String current = mConn.readLine();
-			String replace = current.substring(0, 2);
-
-			int index = cboxPMG.getSelectedIndex();
-			if(index == 0)
-				replace = replace + "+";
-			else
-				replace = replace + "-";
-
-			replace = replace + current.substring(3);
-
-			mConn.writeLine("DLAY 8," + replace);
-
-
-			updateT1();
-			checkError();
-
-		}catch(Exception e){
-
-		}
-	}                                       
-
-	private void cboxPMHActionPerformed(java.awt.event.ActionEvent evt) {                                        
-		try{
-
-			mConn.writeLine("DLAY? 9");
-			String current = mConn.readLine();
-			String replace = current.substring(0, 2);
-
-			int index = cboxPMH.getSelectedIndex();
-			if(index == 0)
-				replace = replace + "+";
-			else
-				replace = replace + "-";
-
-			replace = replace + current.substring(3);
-
-
-			mConn.writeLine("DLAY 9," + replace);
-
-
-			updateT1();
-			checkError();
-		}catch(Exception e){
-
-		}
-	}                                       
-
-	private void cboxLevelActionPerformed(java.awt.event.ActionEvent evt) {                                          
-		try{
-
-			int index = cboxLevel.getSelectedIndex();
-
-			switch(index){
-			case 0:
-				mConn.writeLine("LAMP? 0");
-				txtAmp.setValue(mConn.readLine().substring(1));
-				mConn.writeLine("LOFF? 0");
-				txtOffset.setValue(mConn.readLine());//.substring(1));
-				mConn.writeLine("LPOL? 0");
-				temp = mConn.readLine();
-				if(temp.equals("0"))
-					levelPolarity.setSelected(buttonNeg.getModel(), true);
-				else
-					levelPolarity.setSelected(buttonPos.getModel(), true);
-				break;
-			case 1:
-				mConn.writeLine("LAMP? 1");
-				txtAmp.setValue(mConn.readLine().substring(1));
-				mConn.writeLine("LOFF? 1");
-				txtOffset.setValue(mConn.readLine());//.substring(1));
-				mConn.writeLine("LPOL? 1");
-				temp = mConn.readLine();
-				if(temp.equals("0"))
-					levelPolarity.setSelected(buttonNeg.getModel(), true);
-				else
-					levelPolarity.setSelected(buttonPos.getModel(), true);
-				break;
-			case 2:
-				mConn.writeLine("LAMP? 2");
-				txtAmp.setValue(mConn.readLine().substring(1));
-				mConn.writeLine("LOFF? 2");
-				txtOffset.setValue(mConn.readLine());//.substring(1));
-				mConn.writeLine("LPOL? 2");
-				temp = mConn.readLine();
-				if(temp.equals("0"))
-					levelPolarity.setSelected(buttonNeg.getModel(), true);
-				else
-					levelPolarity.setSelected(buttonPos.getModel(), true);
-				break;
-			case 3:
-				mConn.writeLine("LAMP? 3");
-				txtAmp.setValue(mConn.readLine().substring(1));
-				mConn.writeLine("LOFF? 3");
-				txtOffset.setValue(mConn.readLine());//.substring(1));
-				mConn.writeLine("LPOL? 3");
-				temp = mConn.readLine();
-				if(temp.equals("0"))
-					levelPolarity.setSelected(buttonNeg.getModel(), true);
-				else
-					levelPolarity.setSelected(buttonPos.getModel(), true);
-				break;
-			case 4:
-				mConn.writeLine("LAMP? 4");
-				txtAmp.setValue(mConn.readLine().substring(1));
-				mConn.writeLine("LOFF? 4");
-				txtOffset.setValue(mConn.readLine());//.substring(1));
-				mConn.writeLine("LPOL? 4");
-				temp = mConn.readLine();
-				if(temp.equals("0"))
-					levelPolarity.setSelected(buttonNeg.getModel(), true);
-				else
-					levelPolarity.setSelected(buttonPos.getModel(), true);
-				break;
-			default: System.out.println("Invalid Index");
-			}
-
-		}catch(Exception e){
-
-		}
-	}                                         
-
-	private void txtOffsetPropertyChange(java.beans.PropertyChangeEvent evt) {                                         
-		try{
-
-			mConn.writeLine("LOFF " + cboxLevel.getSelectedIndex() + "," + txtOffset.getValue());
-
-			// checkError();
-		}catch(Exception e){
-
-		}
-	}                                        
-
-	private void txtAmpPropertyChange(java.beans.PropertyChangeEvent evt) {                                      
-		try{
-
-			mConn.writeLine("LAMP " + cboxLevel.getSelectedIndex() + "," + txtAmp.getValue());
-
-			// checkError();
-		}catch(Exception e){
-
-		}
-	}                                     
-
-	private void buttonPosActionPerformed(java.awt.event.ActionEvent evt) {                                          
-		mConn.writeLine("LPOL " + cboxLevel.getSelectedIndex() + ",1");
-	}                                         
-
-	private void buttonNegActionPerformed(java.awt.event.ActionEvent evt) {                                          
-		mConn.writeLine("LPOL " + cboxLevel.getSelectedIndex() + ",0");
-	}                                         
-
-	private void txtValAPropertyChange(java.beans.PropertyChangeEvent evt) {                                       
-		try{
-			mConn.writeLine("DLAY? 2");
-			mConn.writeLine("DLAY 2," + mConn.readLine().substring(0, 3) + txtValA.getValue());
-
-			updateT1();
-			checkError();
-		}catch(Exception e){
-
-		}
-	}                                      
-
-	private void txtValBPropertyChange(java.beans.PropertyChangeEvent evt) {                                       
-		try{
-			mConn.writeLine("DLAY? 3");
-			mConn.writeLine("DLAY 3," + mConn.readLine().substring(0, 3) + txtValB.getValue());
-			updateT1();        
-			checkError();   
-		}catch(Exception e){
-
-		}
-	}                                      
-
-	private void txtValCPropertyChange(java.beans.PropertyChangeEvent evt) {                                       
-		try{
-			mConn.writeLine("DLAY? 4");
-			mConn.writeLine("DLAY 4," + mConn.readLine().substring(0, 3) + txtValC.getValue());
-			updateT1();      
-			checkError();   
-		}catch(Exception e){
-
-		}
-	}                                      
-
-	private void txtValDPropertyChange(java.beans.PropertyChangeEvent evt) {                                       
-		try{
-			mConn.writeLine("DLAY? 5");
-			mConn.writeLine("DLAY 5," + mConn.readLine().substring(0, 3) + txtValD.getValue());
-			updateT1();     
-			checkError();    
-		}catch(Exception e){
-
-		}
-	}                                      
-
-	private void txtValEPropertyChange(java.beans.PropertyChangeEvent evt) {                                       
-		try{
-			mConn.writeLine("DLAY? 6");
-			mConn.writeLine("DLAY 6," + mConn.readLine().substring(0, 3) + txtValE.getValue());
-			updateT1();     
-			checkError();    
-		}catch(Exception e){
-
-		}
-	}                                      
-
-	private void txtValFPropertyChange(java.beans.PropertyChangeEvent evt) {                                       
-		try{
-			mConn.writeLine("DLAY? 7");
-			mConn.writeLine("DLAY 7," + mConn.readLine().substring(0, 3) + txtValF.getValue());
-			updateT1();  
-			checkError();
-		}catch(Exception e){
-
-		}
-	}                                      
-
-	private void txtValGPropertyChange(java.beans.PropertyChangeEvent evt) {                                       
-		try{
-			mConn.writeLine("DLAY? 8");
-			mConn.writeLine("DLAY 8," + mConn.readLine().substring(0, 3) + txtValG.getValue());
-			updateT1();  
-			checkError();  
-		}catch(Exception e){
-
-		}
-	}                                      
-
-	private void txtValHPropertyChange(java.beans.PropertyChangeEvent evt) {                                       
-		try{
-			mConn.writeLine("DLAY? 9");
-			mConn.writeLine("DLAY 9," + mConn.readLine().substring(0, 3) + txtValH.getValue());
-			updateT1();   
-			checkError();   
-		}catch(Exception e){
-
-		}
-	}                                      
+	private void menuSavePopupPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {                                                         
+		// TODO add your handling code here:
+	}                                                        
 
 	/**
 	 * @param args the command line arguments
@@ -3024,43 +2238,46 @@ public class DG645Gui extends javax.swing.JFrame {
 			}
 		});
 	}
-
-	// Variables declaration - do not modify                     
-	private javax.swing.ButtonGroup burstOnOff;
-	private javax.swing.ButtonGroup burstOutput;
-	private javax.swing.JRadioButton buttonExtF;
-	private javax.swing.JRadioButton buttonExtR;
-	private javax.swing.JRadioButton buttonInt;
-	private javax.swing.JRadioButton buttonLine;
-	private javax.swing.JRadioButton buttonNeg;
-	private javax.swing.JRadioButton buttonOff;
-	private javax.swing.JRadioButton buttonOn;
-	private javax.swing.JRadioButton buttonOutputAll;
-	private javax.swing.JRadioButton buttonOutputFirst;
-	private javax.swing.JRadioButton buttonPos;
-	private javax.swing.JRadioButton buttonSngl;
-	private javax.swing.JRadioButton buttonSnglExtF;
-	private javax.swing.JRadioButton buttonSnglExtR;
-	private javax.swing.JRadioButton buttonTrigOff;
-	private javax.swing.JRadioButton buttonTrigOn;
-	private javax.swing.JComboBox cboxChannelA;
-	private javax.swing.JComboBox cboxChannelB;
-	private javax.swing.JComboBox cboxChannelC;
-	private javax.swing.JComboBox cboxChannelD;
-	private javax.swing.JComboBox cboxChannelE;
-	private javax.swing.JComboBox cboxChannelF;
-	private javax.swing.JComboBox cboxChannelG;
-	private javax.swing.JComboBox cboxChannelH;
-	private javax.swing.JComboBox cboxLevel;
-	private javax.swing.JComboBox cboxPMA;
-	private javax.swing.JComboBox cboxPMB;
-	private javax.swing.JComboBox cboxPMC;
-	private javax.swing.JComboBox cboxPMD;
-	private javax.swing.JComboBox cboxPME;
-	private javax.swing.JComboBox cboxPMF;
-	private javax.swing.JComboBox cboxPMG;
-	private javax.swing.JComboBox cboxPMH;
+	
+	
+	// Variables declaration                    
+	public javax.swing.ButtonGroup burstOnOff;
+	public javax.swing.ButtonGroup burstOutput;
+	public javax.swing.JRadioButton buttonExtF;
+	public javax.swing.JRadioButton buttonExtR;
+	public javax.swing.JRadioButton buttonInt;
+	public javax.swing.JRadioButton buttonLine;
+	public javax.swing.JRadioButton buttonNeg;
+	public javax.swing.JRadioButton buttonOff;
+	public javax.swing.JRadioButton buttonOn;
+	public javax.swing.JRadioButton buttonOutputAll;
+	public javax.swing.JRadioButton buttonOutputFirst;
+	public javax.swing.JRadioButton buttonPos;
+	public javax.swing.JRadioButton buttonSngl;
+	public javax.swing.JRadioButton buttonSnglExtF;
+	public javax.swing.JRadioButton buttonSnglExtR;
+	public javax.swing.JRadioButton buttonTrigOff;
+	public javax.swing.JRadioButton buttonTrigOn;
+	public javax.swing.JComboBox cboxChannelA;
+	public javax.swing.JComboBox cboxChannelB;
+	public javax.swing.JComboBox cboxChannelC;
+	public javax.swing.JComboBox cboxChannelD;
+	public javax.swing.JComboBox cboxChannelE;
+	public javax.swing.JComboBox cboxChannelF;
+	public javax.swing.JComboBox cboxChannelG;
+	public javax.swing.JComboBox cboxChannelH;
+	public javax.swing.JComboBox cboxLevel;
+	public javax.swing.JComboBox cboxPMA;
+	public javax.swing.JComboBox cboxPMB;
+	public javax.swing.JComboBox cboxPMC;
+	public javax.swing.JComboBox cboxPMD;
+	public javax.swing.JComboBox cboxPME;
+	public javax.swing.JComboBox cboxPMF;
+	public javax.swing.JComboBox cboxPMG;
+	public javax.swing.JComboBox cboxPMH;
+	private javax.swing.JMenuItem jMenuItem1;
 	private javax.swing.JPanel jPanelT0;
+	private javax.swing.JSeparator jSeparator1;
 	private javax.swing.JTabbedPane jTabMenus;
 	private javax.swing.JLabel labelA;
 	private javax.swing.JLabel labelA1;
@@ -3109,12 +2326,15 @@ public class DG645Gui extends javax.swing.JFrame {
 	private javax.swing.JLabel labelH;
 	private javax.swing.JLabel labelH1;
 	private javax.swing.JLabel labelHold;
+	private javax.swing.JLabel labelHost;
+	private javax.swing.JLabel labelIP;
 	private javax.swing.JLabel labelInt;
 	private javax.swing.JLabel labelLine;
 	private javax.swing.JLabel labelMode;
 	private javax.swing.JLabel labelOffset;
 	private javax.swing.JLabel labelPeriod;
 	private javax.swing.JLabel labelPolarity;
+	private javax.swing.JLabel labelPort;
 	private javax.swing.JLabel labelPresConfig;
 	private javax.swing.JLabel labelSngl;
 	private javax.swing.JLabel labelSnglExt;
@@ -3129,7 +2349,15 @@ public class DG645Gui extends javax.swing.JFrame {
 	private javax.swing.JLabel labelTrigThres;
 	private javax.swing.JLabel labelv;
 	private javax.swing.JLabel labelv2;
-	private javax.swing.ButtonGroup levelPolarity;
+	public javax.swing.ButtonGroup levelPolarity;
+	private javax.swing.JMenuBar menuBar;
+	private javax.swing.JMenu menuEdit;
+	private javax.swing.JMenuItem menuExit;
+	private javax.swing.JMenu menuFile;
+	private javax.swing.JMenuItem menuSave;
+	private javax.swing.JPopupMenu menuSavePopup;
+	private javax.swing.JMenu menuTools;
+	private javax.swing.JMenu menuView;
 	private javax.swing.JPanel panelA;
 	private javax.swing.JPanel panelB;
 	private javax.swing.JPanel panelBurst;
@@ -3144,34 +2372,39 @@ public class DG645Gui extends javax.swing.JFrame {
 	private javax.swing.JPanel panelMain;
 	private javax.swing.JPanel panelModes;
 	private javax.swing.JPanel panelPresConfig;
+	private javax.swing.JPanel panelSettings;
 	private javax.swing.JPanel panelT1;
 	private javax.swing.JPanel panelTrigger;
 	private javax.swing.ButtonGroup triggerAdv;
 	private javax.swing.ButtonGroup triggerModes;
-	private javax.swing.JFormattedTextField txtABphase;
-	private javax.swing.JFormattedTextField txtABpres;
-	private javax.swing.JFormattedTextField txtAmp;
-	private javax.swing.JFormattedTextField txtCDphase;
-	private javax.swing.JFormattedTextField txtCDpres;
-	private javax.swing.JFormattedTextField txtCNT;
-	private javax.swing.JFormattedTextField txtDelay;
-	private javax.swing.JFormattedTextField txtEFphase;
-	private javax.swing.JFormattedTextField txtEFpres;
-	private javax.swing.JFormattedTextField txtGHphase;
-	private javax.swing.JFormattedTextField txtGHpres;
-	private javax.swing.JFormattedTextField txtHold;
-	private javax.swing.JFormattedTextField txtOffset;
-	private javax.swing.JFormattedTextField txtPeriod;
-	private javax.swing.JFormattedTextField txtTrigPres;
-	private javax.swing.JFormattedTextField txtTrigRate;
-	private javax.swing.JFormattedTextField txtTrigThres;
-	private javax.swing.JFormattedTextField txtValA;
-	private javax.swing.JFormattedTextField txtValB;
-	private javax.swing.JFormattedTextField txtValC;
-	private javax.swing.JFormattedTextField txtValD;
-	private javax.swing.JFormattedTextField txtValE;
-	private javax.swing.JFormattedTextField txtValF;
-	private javax.swing.JFormattedTextField txtValG;
-	private javax.swing.JFormattedTextField txtValH;
-	// End of variables declaration                   
+	public javax.swing.JFormattedTextField txtABphase;
+	public javax.swing.JFormattedTextField txtABpres;
+	public javax.swing.JFormattedTextField txtAmp;
+	public javax.swing.JFormattedTextField txtCDphase;
+	public javax.swing.JFormattedTextField txtCDpres;
+	public javax.swing.JFormattedTextField txtCNT;
+	public javax.swing.JFormattedTextField txtDelay;
+	public javax.swing.JFormattedTextField txtEFphase;
+	public javax.swing.JFormattedTextField txtEFpres;
+	public javax.swing.JFormattedTextField txtGHphase;
+	public javax.swing.JFormattedTextField txtGHpres;
+	public javax.swing.JFormattedTextField txtHold;
+	public javax.swing.JTextField txtHost;
+	public javax.swing.JTextField txtIP;
+	public javax.swing.JFormattedTextField txtOffset;
+	public javax.swing.JFormattedTextField txtPeriod;
+	public javax.swing.JTextField txtPort;
+	public javax.swing.JFormattedTextField txtTrigPres;
+	public javax.swing.JFormattedTextField txtTrigRate;
+	public javax.swing.JFormattedTextField txtTrigThres;
+	public javax.swing.JFormattedTextField txtValA;
+	public javax.swing.JFormattedTextField txtValB;
+	public javax.swing.JFormattedTextField txtValC;
+	public javax.swing.JFormattedTextField txtValD;
+	public javax.swing.JFormattedTextField txtValE;
+	public javax.swing.JFormattedTextField txtValF;
+	public javax.swing.JFormattedTextField txtValG;
+	public javax.swing.JFormattedTextField txtValH;
+	// End of variables declaration    
 }
+
