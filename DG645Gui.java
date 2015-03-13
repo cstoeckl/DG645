@@ -17,7 +17,7 @@ public class DG645Gui extends javax.swing.JFrame {
 	
 	int textHeight = 30;
 	
-	private DeviceConnection mConn=new DeviceConnection("172.20.34.210",5025,System.out);
+	//private DeviceConnection mConn=new DeviceConnection("172.20.34.210",5025,System.out);
 	private String temp;
 	private int intemp;
 	private boolean initRun = true;
@@ -28,8 +28,8 @@ public class DG645Gui extends javax.swing.JFrame {
 	{
 		if(!initRun)
 		{	
-			mConn.writeLine("LERR?");
-			intemp = Integer.parseInt(mConn.readLine());
+			DG645Control.dg645.mConn.writeLine("LERR?");
+			intemp = Integer.parseInt(DG645Control.dg645.mConn.readLine());
 
 			switch(intemp){
 			case 0: break; //No error
@@ -54,8 +54,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 	public void updateDelays(String channel)
 	{
-		mConn.writeLine("DLAY? " + channel);
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("DLAY? " + channel);
+		temp = DG645Control.dg645.mConn.readLine();
 
 		//int link;
 		int pm;
@@ -117,8 +117,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 	public void updateT1()
 	{
-		mConn.writeLine("DLAY? 1");
-		temp = mConn.readLine().substring(2);
+		DG645Control.dg645.mConn.writeLine("DLAY? 1");
+		temp = DG645Control.dg645.mConn.readLine().substring(2);
 		labelT1val.setText(temp);
 		//labelT1val.repaint();
 	}
@@ -128,13 +128,14 @@ public class DG645Gui extends javax.swing.JFrame {
 	 * Creates new form DG645Gui
 	 */
 	public DG645Gui() {
+		super("DG645Control");
 
 		action=new DG645Action(this);
 		
-		mConn.writeLine("*CLS");
+		DG645Control.dg645.mConn.writeLine("*CLS");
 
-		mConn.writeLine("*IDN?"); 
-		System.out.println("reply: "+ mConn.readLine());
+		DG645Control.dg645.mConn.writeLine("*IDN?"); 
+		System.out.println("reply: "+ DG645Control.dg645.mConn.readLine());
 
 		initComponents();
 		initRun = false;
@@ -317,8 +318,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		
 		panelTrigger.setPreferredSize(new java.awt.Dimension(1200, 500));
 
-		mConn.writeLine("TRAT?");
-		temp = mConn.readLine().substring(1);
+		DG645Control.dg645.mConn.writeLine("TRAT?");
+		temp = DG645Control.dg645.mConn.readLine().substring(1);
 		temp = ("0000.000000" + temp).substring(temp.length());
 		try {
 			txtTrigRate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####.######")));
@@ -332,8 +333,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtTrigRate.setPreferredSize(new java.awt.Dimension(120, 30));
 		txtTrigRate.addPropertyChangeListener(action);
 
-		mConn.writeLine("TLVL?");
-		temp = mConn.readLine(); //.substring(1);
+		DG645Control.dg645.mConn.writeLine("TLVL?");
+		temp = DG645Control.dg645.mConn.readLine(); //.substring(1);
 		//temp = ("0.00" + temp).substring(temp.length());
 		try {
 			txtTrigThres.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("*#.##")));
@@ -358,8 +359,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		buttonTrigOff.setText("Off");
 		buttonTrigOff.setPreferredSize(new java.awt.Dimension(50, 30));
 		buttonTrigOff.addActionListener(action);
-		mConn.writeLine("ADVT?");
-		switch(Integer.parseInt(mConn.readLine())) {
+		DG645Control.dg645.mConn.writeLine("ADVT?");
+		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
 		case 0: triggerAdv.setSelected(buttonTrigOff.getModel(), true);
 		break;
 		case 1: triggerAdv.setSelected(buttonTrigOn.getModel(), true);
@@ -367,8 +368,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		default: System.out.println("Invalid ADVT");
 		}
 
-		mConn.writeLine("HOLD?");
-		temp = mConn.readLine().substring(1);
+		DG645Control.dg645.mConn.writeLine("HOLD?");
+		temp = DG645Control.dg645.mConn.readLine().substring(1);
 		temp = ("0.000000000000" + temp).substring(temp.length());
 		try {
 			txtHold.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#.############")));
@@ -442,8 +443,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelTrigPS.setText("TRG Prescale");
 		labelTrigPS.setPreferredSize(new java.awt.Dimension(100, 30));
 
-		mConn.writeLine("PRES? 0");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("PRES? 0");
+		temp = DG645Control.dg645.mConn.readLine();
 		temp = ("0000000000" + temp).substring(temp.length());
 		try {
 			txtTrigPres.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#,###,###,###")));
@@ -497,8 +498,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelGHphase.setText("GH Phase");
 		labelGHphase.setPreferredSize(new java.awt.Dimension(85, 30));
 
-		mConn.writeLine("PRES? 1");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("PRES? 1");
+		temp = DG645Control.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtABpres.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##,###")));
@@ -512,8 +513,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtABpres.addPropertyChangeListener(action);
 		
 
-		mConn.writeLine("PRES? 2");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("PRES? 2");
+		temp = DG645Control.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtCDpres.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##,###")));
@@ -526,8 +527,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtCDpres.setPreferredSize(new java.awt.Dimension(100, 30));
 		txtCDpres.addPropertyChangeListener(action);
 
-		mConn.writeLine("PRES? 3");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("PRES? 3");
+		temp = DG645Control.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtEFpres.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##,###")));
@@ -540,8 +541,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtEFpres.setPreferredSize(new java.awt.Dimension(100, 30));
 		txtEFpres.addPropertyChangeListener(action);
 
-		mConn.writeLine("PRES? 4");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("PRES? 4");
+		temp = DG645Control.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtGHpres.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##,###")));
@@ -554,8 +555,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtGHpres.setPreferredSize(new java.awt.Dimension(100, 30));
 		txtGHpres.addPropertyChangeListener(action);
 
-		mConn.writeLine("PHAS? 1");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("PHAS? 1");
+		temp = DG645Control.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtABphase.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##,###")));
@@ -568,8 +569,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtABphase.setPreferredSize(new java.awt.Dimension(100, 30));
 		txtABphase.addPropertyChangeListener(action);
 
-		mConn.writeLine("PHAS? 2");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("PHAS? 2");
+		temp = DG645Control.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtCDphase.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##,###")));
@@ -582,8 +583,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtCDphase.setPreferredSize(new java.awt.Dimension(100, 30));
 		txtCDphase.addPropertyChangeListener(action);
 
-		mConn.writeLine("PHAS? 3");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("PHAS? 3");
+		temp = DG645Control.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtEFphase.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##,###")));
@@ -596,8 +597,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtEFphase.setPreferredSize(new java.awt.Dimension(100, 30));
 		txtEFphase.addPropertyChangeListener(action);
 
-		mConn.writeLine("PHAS? 4");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("PHAS? 4");
+		temp = DG645Control.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtGHphase.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##,###")));
@@ -743,8 +744,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		buttonLine.setText("LINE");
 		buttonLine.setPreferredSize(new java.awt.Dimension(120, 30));
 		buttonLine.addActionListener(action);
-		mConn.writeLine("TSRC?");
-		switch(Integer.parseInt(mConn.readLine())) {
+		DG645Control.dg645.mConn.writeLine("TSRC?");
+		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
 		case 0: triggerModes.setSelected(buttonInt.getModel(), true);
 		break;
 		case 1: triggerModes.setSelected(buttonExtR.getModel(), true);
@@ -1000,8 +1001,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		buttonOff.setText("Off");
 		buttonOff.setPreferredSize(new java.awt.Dimension(60, 30));
 		buttonOff.addActionListener(action);
-		mConn.writeLine("BURM?");
-		switch(Integer.parseInt(mConn.readLine())) {
+		DG645Control.dg645.mConn.writeLine("BURM?");
+		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
 		case 0: burstOnOff.setSelected(buttonOff.getModel(), true);
 		break;
 		case 1: burstOnOff.setSelected(buttonOn.getModel(), true);
@@ -1020,8 +1021,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		buttonOutputFirst.setText("T0 fire on first delay cycle of burst");
 		buttonOutputFirst.setPreferredSize(new java.awt.Dimension(300, 30));
 		buttonOutputFirst.addActionListener(action);
-		mConn.writeLine("BURT?");
-		switch(Integer.parseInt(mConn.readLine())) {
+		DG645Control.dg645.mConn.writeLine("BURT?");
+		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
 		case 0: burstOutput.setSelected(buttonOutputAll.getModel(), true);
 		break;
 		case 1: burstOutput.setSelected(buttonOutputFirst.getModel(), true);
@@ -1029,8 +1030,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		default: System.out.println("Invalid BURT");
 		}
 
-		mConn.writeLine("BURC?");
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("BURC?");
+		temp = DG645Control.dg645.mConn.readLine();
 		try {
 			txtCNT.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##########")));
 		} catch (java.text.ParseException ex) {
@@ -1042,9 +1043,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtCNT.setPreferredSize(new java.awt.Dimension(50, 30));
 		txtCNT.addPropertyChangeListener(action);
 
-		mConn.writeLine("BURP?");
-		//temp = mConn.readLine();
-		temp = mConn.readLine().substring(1);
+		DG645Control.dg645.mConn.writeLine("BURP?");
+		//temp = DG645Control.dg645.mConn.readLine();
+		temp = DG645Control.dg645.mConn.readLine().substring(1);
 		temp = ("0.00000000" + temp).substring(temp.length());
 		try {
 			txtPeriod.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#.########")));
@@ -1057,9 +1058,9 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtPeriod.setPreferredSize(new java.awt.Dimension(50, 30));
 		txtPeriod.addPropertyChangeListener(action);
 
-		mConn.writeLine("BURD?");
-		//temp = mConn.readLine();
-		temp = mConn.readLine().substring(1);
+		DG645Control.dg645.mConn.writeLine("BURD?");
+		//temp = DG645Control.dg645.mConn.readLine();
+		temp = DG645Control.dg645.mConn.readLine().substring(1);
 		temp = ("0.000000000000" + temp).substring(temp.length());
 		try {
 			txtDelay.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#.############")));
@@ -1233,8 +1234,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelChannel0.setText("0");
 		labelChannel0.setPreferredSize(new java.awt.Dimension(55, 30));
 
-		mConn.writeLine("DLAY? 0");  
-		temp = mConn.readLine().substring(2);
+		DG645Control.dg645.mConn.writeLine("DLAY? 0");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2);
 		labelT0val.setFont(deFont); // NOI18N
 		labelT0val.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelT0val.setText(temp);
@@ -1282,8 +1283,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelT1.setText("T1");
 		labelT1.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		mConn.writeLine("DLAY? 1");  
-		temp = mConn.readLine().substring(2);
+		DG645Control.dg645.mConn.writeLine("DLAY? 1");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2);
 		labelT1val.setFont(deFont); // NOI18N
 		labelT1val.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		labelT1val.setText(temp);
@@ -1317,8 +1318,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		panelA.setPreferredSize(new java.awt.Dimension(500, 30));
 
-		mConn.writeLine("DLAY? 2");
-		temp = mConn.readLine().substring(0,1);
+		DG645Control.dg645.mConn.writeLine("DLAY? 2");
+		temp = DG645Control.dg645.mConn.readLine().substring(0,1);
 
 		if(temp.equals("0"))
 			intemp = 0;
@@ -1331,8 +1332,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxChannelA.setPreferredSize(new java.awt.Dimension(55, 30));
 		cboxChannelA.addActionListener(action);
 		
-		mConn.writeLine("DLAY? 2");  
-		temp = mConn.readLine().substring(2,3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 2");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
@@ -1352,8 +1353,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelA.setText("A");
 		labelA.setPreferredSize(new java.awt.Dimension(30, 30));
 
-		mConn.writeLine("DLAY? 2");  
-		temp = mConn.readLine().substring(3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 2");  
+		temp = DG645Control.dg645.mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
 		try {
 			txtValA.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.############")));
@@ -1395,8 +1396,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		panelB.setPreferredSize(new java.awt.Dimension(500, 30));
 
-		mConn.writeLine("DLAY? 3");  
-		temp = mConn.readLine().substring(2,3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 3");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
@@ -1416,8 +1417,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelEqualB.setText("=");
 		labelEqualB.setPreferredSize(new java.awt.Dimension(15, 30));
 
-		mConn.writeLine("DLAY? 3");  
-		temp = mConn.readLine().substring(3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 3");  
+		temp = DG645Control.dg645.mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
 		try {
 			txtValB.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.############")));
@@ -1429,8 +1430,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		txtValB.setPreferredSize(new java.awt.Dimension(200, 30));
 		txtValB.addPropertyChangeListener(action);
 
-		mConn.writeLine("DLAY? 3");
-		temp = mConn.readLine().substring(0,1);
+		DG645Control.dg645.mConn.writeLine("DLAY? 3");
+		temp = DG645Control.dg645.mConn.readLine().substring(0,1);
 		intemp = Integer.parseInt(temp);
 
 		if(intemp == 0)
@@ -1477,8 +1478,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		panelC.setPreferredSize(new java.awt.Dimension(500, 30));
 
-		mConn.writeLine("DLAY? 4");
-		temp = mConn.readLine().substring(0,1);
+		DG645Control.dg645.mConn.writeLine("DLAY? 4");
+		temp = DG645Control.dg645.mConn.readLine().substring(0,1);
 		intemp = Integer.parseInt(temp);
 
 		if(intemp == 0)
@@ -1495,8 +1496,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxChannelC.setPreferredSize(new java.awt.Dimension(55, 30));
 		cboxChannelC.addActionListener(action);
 
-		mConn.writeLine("DLAY? 4");  
-		temp = mConn.readLine().substring(2,3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 4");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
@@ -1516,8 +1517,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelEqualC.setText("=");
 		labelEqualC.setPreferredSize(new java.awt.Dimension(15, 30));
 
-		mConn.writeLine("DLAY? 4");  
-		temp = mConn.readLine().substring(3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 4");  
+		temp = DG645Control.dg645.mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
 		try {
 			txtValC.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.############")));
@@ -1559,8 +1560,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		panelD.setPreferredSize(new java.awt.Dimension(500, 30));
 
-		mConn.writeLine("DLAY? 5");
-		temp = mConn.readLine().substring(0,1);
+		DG645Control.dg645.mConn.writeLine("DLAY? 5");
+		temp = DG645Control.dg645.mConn.readLine().substring(0,1);
 		intemp = Integer.parseInt(temp);
 
 		if(intemp == 0)
@@ -1578,8 +1579,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxChannelD.addActionListener(action);
 		
 
-		mConn.writeLine("DLAY? 5");  
-		temp = mConn.readLine().substring(2,3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 5");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
@@ -1590,8 +1591,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxPMD.setPreferredSize(new java.awt.Dimension(45, 30));
 		cboxPMD.addActionListener(action);
 		
-		mConn.writeLine("DLAY? 5");  
-		temp = mConn.readLine().substring(3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 5");  
+		temp = DG645Control.dg645.mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
 		try {
 			txtValD.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.############")));
@@ -1642,8 +1643,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		panelE.setPreferredSize(new java.awt.Dimension(500, 30));
 
-		mConn.writeLine("DLAY? 6");
-		temp = mConn.readLine().substring(0,1);
+		DG645Control.dg645.mConn.writeLine("DLAY? 6");
+		temp = DG645Control.dg645.mConn.readLine().substring(0,1);
 		intemp = Integer.parseInt(temp);
 
 		if(intemp == 0)
@@ -1661,8 +1662,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxChannelE.addActionListener(action);
 		
 
-		mConn.writeLine("DLAY? 6");  
-		temp = mConn.readLine().substring(2,3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 6");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
@@ -1674,8 +1675,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxPME.addActionListener(action);
 		
 
-		mConn.writeLine("DLAY? 6");  
-		temp = mConn.readLine().substring(3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 6");  
+		temp = DG645Control.dg645.mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
 		try {
 			txtValE.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.############")));
@@ -1727,8 +1728,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		panelF.setPreferredSize(new java.awt.Dimension(500, 30));
 
-		mConn.writeLine("DLAY? 7");
-		temp = mConn.readLine().substring(0,1);
+		DG645Control.dg645.mConn.writeLine("DLAY? 7");
+		temp = DG645Control.dg645.mConn.readLine().substring(0,1);
 
 		intemp = Integer.parseInt(temp);
 
@@ -1747,8 +1748,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxChannelF.addActionListener(action);
 		
 
-		mConn.writeLine("DLAY? 7");  
-		temp = mConn.readLine().substring(2,3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 7");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
@@ -1769,8 +1770,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelEqualF.setText("=");
 		labelEqualF.setPreferredSize(new java.awt.Dimension(15, 30));
 
-		mConn.writeLine("DLAY? 7");  
-		temp = mConn.readLine().substring(3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 7");  
+		temp = DG645Control.dg645.mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
 		try {
 			txtValF.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.############")));
@@ -1812,8 +1813,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		panelG.setPreferredSize(new java.awt.Dimension(500, 30));
 
-		mConn.writeLine("DLAY? 8");
-		temp = mConn.readLine().substring(0,1);
+		DG645Control.dg645.mConn.writeLine("DLAY? 8");
+		temp = DG645Control.dg645.mConn.readLine().substring(0,1);
 
 		intemp = Integer.parseInt(temp);
 
@@ -1832,8 +1833,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxChannelG.addActionListener(action);
 		
 
-		mConn.writeLine("DLAY? 8");  
-		temp = mConn.readLine().substring(2,3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 8");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
@@ -1854,8 +1855,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelEqualG.setText("=");
 		labelEqualG.setPreferredSize(new java.awt.Dimension(15, 30));
 
-		mConn.writeLine("DLAY? 8");  
-		temp = mConn.readLine().substring(3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 8");  
+		temp = DG645Control.dg645.mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
 		try {
 			txtValG.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.############")));
@@ -1896,8 +1897,8 @@ public class DG645Gui extends javax.swing.JFrame {
 
 		panelH.setPreferredSize(new java.awt.Dimension(500, 30));
 
-		mConn.writeLine("DLAY? 9");
-		temp = mConn.readLine().substring(0,1);
+		DG645Control.dg645.mConn.writeLine("DLAY? 9");
+		temp = DG645Control.dg645.mConn.readLine().substring(0,1);
 
 		intemp = Integer.parseInt(temp);
 
@@ -1915,8 +1916,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxChannelH.setPreferredSize(new java.awt.Dimension(55, 30));
 		cboxChannelH.addActionListener(action);
 		
-		mConn.writeLine("DLAY? 9");  
-		temp = mConn.readLine().substring(2,3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 9");  
+		temp = DG645Control.dg645.mConn.readLine().substring(2,3);  
 		if(temp.equals("+"))      
 			intemp = 0;
 		else
@@ -1927,8 +1928,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		cboxPMH.setPreferredSize(new java.awt.Dimension(45, 30));
 		cboxPMH.addActionListener(action);
 		
-		mConn.writeLine("DLAY? 9");  
-		temp = mConn.readLine().substring(3);  
+		DG645Control.dg645.mConn.writeLine("DLAY? 9");  
+		temp = DG645Control.dg645.mConn.readLine().substring(3);  
 		temp = ("000.000000000000" + temp).substring(temp.length());
 		try {
 			txtValH.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.############")));
@@ -2078,8 +2079,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelPolarity.setText("Polarity");
 		labelPolarity.setPreferredSize(new java.awt.Dimension(100, 30));
 
-		mConn.writeLine("LOFF?" + cboxLevel.getSelectedIndex());
-		temp = mConn.readLine();
+		DG645Control.dg645.mConn.writeLine("LOFF?" + cboxLevel.getSelectedIndex());
+		temp = DG645Control.dg645.mConn.readLine();
 		try {
 			txtOffset.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("*#.##")));
 		} catch (java.text.ParseException ex) {
@@ -2096,8 +2097,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		labelv.setText("V");
 		labelv.setPreferredSize(new java.awt.Dimension(15, 30));
 
-		mConn.writeLine("LAMP?" + cboxLevel.getSelectedIndex());
-		temp = mConn.readLine().substring(1);
+		DG645Control.dg645.mConn.writeLine("LAMP?" + cboxLevel.getSelectedIndex());
+		temp = DG645Control.dg645.mConn.readLine().substring(1);
 		temp = ("0.00" + temp).substring(temp.length());
 		try {
 			txtAmp.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#.##")));
@@ -2126,8 +2127,8 @@ public class DG645Gui extends javax.swing.JFrame {
 		buttonNeg.setText("Negative");
 		buttonNeg.setPreferredSize(new java.awt.Dimension(100, 30));
 		buttonNeg.addActionListener(action);
-		mConn.writeLine("LPOL?" + cboxLevel.getSelectedIndex());
-		switch(Integer.parseInt(mConn.readLine())) {
+		DG645Control.dg645.mConn.writeLine("LPOL?" + cboxLevel.getSelectedIndex());
+		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
 		case 0: levelPolarity.setSelected(buttonNeg.getModel(), true);
 		break;
 		case 1: levelPolarity.setSelected(buttonPos.getModel(), true);
@@ -2207,12 +2208,12 @@ public class DG645Gui extends javax.swing.JFrame {
 	/**
 	 * @param args the command line arguments
 	 */
-	public static void main(String args[]) {
+	/*public static void main(String args[]) {
 		/* Set the Nimbus look and feel */
 		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
 		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
 		 * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-		 */
+		 
 		try {
 			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -2231,13 +2232,13 @@ public class DG645Gui extends javax.swing.JFrame {
 		}
 		//</editor-fold>
 
-		/* Create and display the form */
+		/* Create and display the form 
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				new DG645Gui().setVisible(true);
 			}
 		});
-	}
+	}*/
 	
 	
 	// Variables declaration                    

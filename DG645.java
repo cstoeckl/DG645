@@ -65,7 +65,9 @@ public class DG645 implements Runnable {
 	
 	public void trigger(String mode, String rate, String threshold, String advmode, String hold, String edge, String prescale, String phase)
 	{
-		if (!initialized) return;
+		System.out.println("At trigger in DG645");
+		System.out.println("Hold " + hold);
+		//if (!connected) return;
 		
 		if(mode != null)
 			this.mode = mode;
@@ -75,6 +77,8 @@ public class DG645 implements Runnable {
 			this.threshold = threshold;
 		if(advmode != null)
 			this.advmode = advmode;
+		if(hold != null)
+			this.hold = hold;
 		if(edge != null)
 			this.edge = edge;
 		if(prescale != null)
@@ -85,6 +89,10 @@ public class DG645 implements Runnable {
 		work = new Thread(this,"Trigger");
 		isMoving = true;
 		work.start(); 	
+		
+		//work.run();
+		
+		System.out.println("At trigger in DG645 end");
 	}
 	
 	public void delay(String delayChannel, String linkChannel, String value)
@@ -218,6 +226,7 @@ public class DG645 implements Runnable {
 
 	public void run() 
 	{		
+		System.out.println("Work name" + work.getName());
 		if (work.getName().startsWith("Connecting")) {
 			mConn = new DeviceConnection(host,5025,System.out); 
 			mConn.writeLine("*IDN?");
@@ -239,13 +248,29 @@ public class DG645 implements Runnable {
 			initialized = true;
 			isMoving = false;
 		} else if(work.getName().equals("Trigger")) { 
-			mConn.writeLine("TSRC " + mode);
-			mConn.writeLine("TRAT " + rate);
-			mConn.writeLine("TLVL," + threshold);
-			mConn.writeLine("ADVT " + advmode);
-			mConn.writeLine("HOLD " + hold);
-			mConn.writeLine("PRES " + edge + "," + prescale); 
-			mConn.writeLine("PHAS " + edge + "," + phase);
+			
+			try{
+				if(mode != null)
+					mConn.writeLine("TSRC " + mode);
+				if(rate != null)
+				mConn.writeLine("TRAT " + rate);
+				if(threshold !=null)
+				mConn.writeLine("TLVL," + threshold);
+				if(advmode !=null)
+				mConn.writeLine("ADVT " + advmode);
+				if(hold !=null)
+				{
+					System.out.println("hold " + hold);
+					mConn.writeLine("HOLD " + hold);
+					mConn.writeLine("HOLD?");
+					System.out.println(mConn.readLine());
+				}
+				if(edge != null && prescale !=null)
+				mConn.writeLine("PRES " + edge + "," + prescale); 
+				if(edge != null && phase !=null)
+				mConn.writeLine("PHAS " + edge + "," + phase);
+			}catch(Exception e){};
+			
 		} else if(work.getName().equals("Burst")) {
 			mConn.writeLine("BURM " + burstStatus);
 			mConn.writeLine("BURT " + fireon);

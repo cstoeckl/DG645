@@ -33,18 +33,18 @@ public class DG645Control  {
 			}
 		};
 		
-	//	dg645 = new DG645("172.20.34.210");
+		dg645 = new DG645("172.20.34.210");
 		
-	/*	dg645Gui = new DG645Gui();
+		dg645Gui = new DG645Gui();
 		dg645Gui.addWindowListener(l);
 		dg645Gui.pack();
-		dg645Gui.setSize(350, 230);
+	//	dg645Gui.setSize(350, 230);
 		dg645Gui.setVisible(true);
 		
 		// automatically connect to DG645-Box
-		dg645Gui.action.connect();*/
+		dg645Gui.action.connect();
 		
-		DG645Gui dggui = new DG645Gui();
+		//DG645Gui dggui = new DG645Gui();
 		
 	
 	}
