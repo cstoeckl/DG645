@@ -33,7 +33,7 @@ public class DG645Control  {
 			}
 		};
 		
-		dg645 = new DG645("172.20.34.210");
+		dg645 = new DG645("172.20.34.210", 5025);
 		dg645.connect();
 		
 		dg645Gui = new DG645Gui();

@@ -15,10 +15,11 @@ import lib.*;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class DG645 implements Runnable {
-	
+
 	public DeviceConnection mConn=null;
 	private Thread work;
 	private  String host;
+	private int port;
 	private String tmp;
 	private double z;
 	public String relais="000000000000 0.0ns";
@@ -29,7 +30,7 @@ public class DG645 implements Runnable {
 	public boolean initialized = false;
 	public boolean overLimit = false;
 	final static  DecimalFormat valueFormat = new DecimalFormat("0.000");
-	
+
 	//trigger variables
 	private String mode;
 	private String rate;
@@ -39,36 +40,35 @@ public class DG645 implements Runnable {
 	private String edge;
 	private String prescale;
 	private String phase;
-	
+
 	//burst variables
 	private String burstStatus;
 	private String fireon;
 	private String cnt;
 	private String period;
 	private String delay;
-	
+
 	//delay variables
 	private String delayChannel;
 	private String linkChannel;
 	private String delayVal;
-	
+
 	//level variables
 	private String levelChannel;
 	private String offset;
 	private String amplitude;
 	private String polarity;
-	
-	public DG645(String server)
+
+	public DG645(String server, int port)
 	{
 		host = server;
+		this.port = port;
 	}
-	
+
 	public void trigger(String mode, String rate, String threshold, String advmode, String hold, String edge, String prescale, String phase)
 	{
-		System.out.println("At trigger in DG645");
-		System.out.println("Hold " + hold);
-		//if (!connected) return;
-		
+		if (!connected) return;
+
 		if(mode != null)
 			this.mode = mode;
 		if(rate != null)
@@ -85,36 +85,36 @@ public class DG645 implements Runnable {
 			this.prescale = prescale;
 		if(phase != null)
 			this.phase = phase;
-		
+
 		work = new Thread(this,"Trigger");
 		isMoving = true;
 		work.start(); 	
-		
+
 		//work.run();
-		
+
 		System.out.println("At trigger in DG645 end");
 	}
-	
+
 	public void delay(String delayChannel, String linkChannel, String value)
 	{
-		if (!initialized) return;
-		
+		if (!connected) return;
+
 		if(delayChannel != null)
 			this.delayChannel = delayChannel;
 		if(linkChannel != null)
 			this.linkChannel = linkChannel;
 		if(value != null)
 			this.delayVal = value;
-		
+
 		work = new Thread(this,"Delay");
 		isMoving = true;
 		work.start(); 	
 	}
-	
+
 	public void burst(String burstStatus, String fireon, String cnt, String period, String delay)
 	{
-		if (!initialized) return;
-		
+		if (!connected) return;
+
 		if(burstStatus != null)
 			this.burstStatus = burstStatus;
 		if(fireon != null)
@@ -125,16 +125,16 @@ public class DG645 implements Runnable {
 			this.period = period;
 		if(delay != null)
 			this.delay = delay;
-		
+
 		work = new Thread(this,"Burst");
 		isMoving = true;
 		work.start(); 	
 	}
-	
+
 	public void level(String channel, String offset, String amp, String polarity)
 	{
-		if (!initialized) return;
-		
+		if (!connected) return;
+
 		if(channel != null)
 			this.levelChannel = channel;
 		if(offset != null)
@@ -143,7 +143,7 @@ public class DG645 implements Runnable {
 			this.amplitude = amp;
 		if(polarity != null)
 			this.polarity = polarity;
-		
+
 		work = new Thread(this,"Level");
 		isMoving = true;
 		work.start(); 	
@@ -154,24 +154,21 @@ public class DG645 implements Runnable {
 		work = new Thread(this,"Connecting");
 		isMoving = true;
 		work.start();
-		System.out.println("Here at connect");
 	}
-	
+
 	public void init() 
 	{
 		if (!connected) return;
 		work = new Thread(this,"Init");
 		isMoving = true;
 		work.start(); 	
-
-		System.out.println("Here at init");
 	}
-	
+
 	public void stop() 
 	{
 		initialized = false;
 	}
-	
+
 	public void move(double P) 
 	{
 		if (!initialized) return;
@@ -179,67 +176,36 @@ public class DG645 implements Runnable {
 		work = new Thread(this,"Moving");
 		isMoving = true;
 		work.start(); 		
-		
+
 
 		System.out.println("Here at move");
 	}
-	
-	private double process(double x, double y){
-		if (Math.abs(y) > limit) {
-			return x; 
-		}
-		String tmp = "del " + valueFormat.format(y) + " ns";
-//		System.out.println("process " + tmp);
-		mConn.writeLine(tmp);
-		mConn.writeLine("del?");
-		tmp = mConn.readLine();
-//		System.out.println(tmp);
-		mConn.writeLine("rel?");
-		tmp = mConn.readLine();
-		System.out.println("reply: "+ tmp);
-		relais = tmp;
-		if (!tmp.equals("success")) {
-			overLimit = false;
-			return y;
-		} else {
-			initialized = false;
-			overLimit = true;
-			return x;		
-		}
-	}
-	
-	public void step(double P) {
-		if (Pos != P) {
-			Pos = process(Pos, P);	
-		}
-	}
-	
+
 	public synchronized void waitDone(int timeout) {
 		try {
 			wait(timeout*1000);
 		} catch (InterruptedException e) {}
 	}
-	
+
 	private synchronized void workDone() {
 		notifyAll();
 	}
 
 	public void run() 
 	{		
-		System.out.println("Work name" + work.getName());
 		if (work.getName().startsWith("Connecting")) {
-			mConn = new DeviceConnection(host,5025,System.out); 
+			mConn = new DeviceConnection(host,port,System.out); 
 			mConn.writeLine("*IDN?");
 			tmp = mConn.readLine();
 			System.out.println("reply: "+ tmp);
 			Pos = 0.0;
 			connected = true;
 			isMoving = false;
-			
+
 		} else if (work.getName().equals("Init")) {
 			mConn.writeLine("del?");
 			tmp = mConn.readLine();
-//			System.out.println("reply: "+ tmp);
+			//			System.out.println("reply: "+ tmp);
 			Pos = Double.parseDouble(tmp)/1e-9;
 			mConn.writeLine("rel?");
 			tmp = mConn.readLine();
@@ -248,29 +214,24 @@ public class DG645 implements Runnable {
 			initialized = true;
 			isMoving = false;
 		} else if(work.getName().equals("Trigger")) { 
-			
+
 			try{
 				if(mode != null)
 					mConn.writeLine("TSRC " + mode);
 				if(rate != null)
-				mConn.writeLine("TRAT " + rate);
+					mConn.writeLine("TRAT " + rate);
 				if(threshold !=null)
-				mConn.writeLine("TLVL," + threshold);
+					mConn.writeLine("TLVL," + threshold);
 				if(advmode !=null)
-				mConn.writeLine("ADVT " + advmode);
+					mConn.writeLine("ADVT " + advmode);
 				if(hold !=null)
-				{
-					System.out.println("hold " + hold);
 					mConn.writeLine("HOLD " + hold);
-					mConn.writeLine("HOLD?");
-					System.out.println(mConn.readLine());
-				}
 				if(edge != null && prescale !=null)
-				mConn.writeLine("PRES " + edge + "," + prescale); 
+					mConn.writeLine("PRES " + edge + "," + prescale); 
 				if(edge != null && phase !=null)
-				mConn.writeLine("PHAS " + edge + "," + phase);
+					mConn.writeLine("PHAS " + edge + "," + phase);
 			}catch(Exception e){};
-			
+
 		} else if(work.getName().equals("Burst")) {
 			mConn.writeLine("BURM " + burstStatus);
 			mConn.writeLine("BURT " + fireon);
@@ -286,14 +247,13 @@ public class DG645 implements Runnable {
 			mConn.writeLine("LPOL " + levelChannel + "," + polarity); 
 		}
 		else {
-//			System.out.println("moving");
-			step(z);
+			//			System.out.println("moving");
 			isMoving = false;	
 		}
 		workDone();
 	}
-	
-	
+
+
 
 }
 

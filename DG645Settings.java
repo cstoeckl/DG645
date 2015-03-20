@@ -20,60 +20,34 @@ public class DG645Settings extends JDialog implements ActionListener
 	static Properties microscopeProperties=new Properties();
     static String file = "Microscope.properties";
     static final String s = File.separator;
-    public JTextField propField,integField,derivField,gainField,veloField;
+    public JTextField hostField, portField;
     
     /** Creates new CCDSettings */
     public DG645Settings(JFrame parent) {
         super(parent);
-        this.setTitle("Scint Control Settings");
+        this.setTitle("DG645 Control Settings");
         
         // create panel with border and layout for path infomation
         JPanel pathPane = new JPanel();
         pathPane.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
         pathPane.setLayout(new GridLayout(0, 2));
         
-         // text field for setup path
-        propField = new JTextField(4);
-        propField.setHorizontalAlignment(JTextField.RIGHT);
         
-        pathPane.add(new JLabel("Proportional:  "));
-        pathPane.add(propField);
+        //text field for host name
+        hostField = new JTextField(4);
+        hostField.setHorizontalAlignment(JTextField.RIGHT);
+        
+        pathPane.add(new JLabel("Host Name:  "));
+        pathPane.add(hostField);
         pathPane.add(new JLabel(""));
         pathPane.add(new JLabel(""));
         
-        // text field to set remote save path;
-        integField = new JTextField(4);
-        integField.setHorizontalAlignment(JTextField.RIGHT);
+      //text field for port
+        portField = new JTextField(4);
+        portField.setHorizontalAlignment(JTextField.RIGHT);
         
-        pathPane.add(new JLabel("Integral:  "));
-        pathPane.add(integField);
-        pathPane.add(new JLabel(""));
-        pathPane.add(new JLabel(""));
-        
-        // text field to set local save path;
-        derivField = new JTextField(4);
-        derivField.setHorizontalAlignment(JTextField.RIGHT);
-        
-        pathPane.add(new JLabel("Differential:  "));
-        pathPane.add(derivField);
-        pathPane.add(new JLabel(""));
-        pathPane.add(new JLabel(""));
-        
-        // text field to set local save path;
-        veloField = new JTextField(4);
-        veloField.setHorizontalAlignment(JTextField.RIGHT);
-        
-        pathPane.add(new JLabel("Velocity:  "));
-        pathPane.add(veloField);
-        pathPane.add(new JLabel(""));
-        pathPane.add(new JLabel(""));
-        
-//      text field to set local save path;
-        gainField = new JTextField(4);
-        gainField.setHorizontalAlignment(JTextField.RIGHT);
-        
-        pathPane.add(new JLabel("Gain:  "));
-        pathPane.add(gainField);
+        pathPane.add(new JLabel("Port:  "));
+        pathPane.add(portField);
         pathPane.add(new JLabel(""));
         pathPane.add(new JLabel(""));
         
@@ -116,11 +90,8 @@ public class DG645Settings extends JDialog implements ActionListener
         String action = e.getActionCommand();
         
         if (action.startsWith("Apply") || action.startsWith("Ok")) {
-            microscopeProperties.put("Proportional",propField.getText());
-            microscopeProperties.put("Integral",integField.getText());
-            microscopeProperties.put("Derivative",derivField.getText());
-            microscopeProperties.put("Velocity",veloField.getText());
-            microscopeProperties.put("Gain",gainField.getText());
+            microscopeProperties.put("Host Name",hostField.getText());
+            microscopeProperties.put("Port",portField.getText());
             microscopeProperties.list(System.out);
             try {
                 FileOutputStream out = new FileOutputStream(file);

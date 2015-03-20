@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 
@@ -54,51 +53,26 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 
 		//new
 
-		//System.out.println("prop name " +evt.getPropertyName() );   //property name either ancestor or value
-	//	System.out.println("source name " + evt.getSource().getClass()); //source is object
-
-	//	System.out.println("testing for txthold " + miGui.txtHold);
-
-		triggerProperty(evt);
-		//levelProperty(evt);
-		//burstProperty(evt);
-		//delayProperty(evt);
 		//check for all trigger sources
-		/*if(evt.getSource().equals()){
-
-		}
-
-		//check for all burst sources
-		if(evt.getSource().equals()){
-
-		}
-
-		//check for all delay sources
-		if(evt.getSource().equals()){
-
-		}
-
-		//check for all level sources
-		if(evt.getSource().equals()){
-
-		}*/
-
-
-		/*	if (evt.getPropertyName().equals("Trigger")) {		
+		if(evt.getSource().getClass().getName().endsWith("Trigger")){
 			triggerProperty(evt);
 		}
 
-		if (evt.getPropertyName().equals("Burst")) {			
+		//check for all burst sources
+		if(evt.getSource().getClass().getName().endsWith("Burst")){
+			levelProperty(evt);
+		}
+
+		//check for all delay sources
+		if(evt.getSource().getClass().getName().endsWith("Delay")){
 			burstProperty(evt);
 		}
 
-		if (evt.getPropertyName().equals("Delay")) {		
-			delayProperty(evt);	
+		//check for all level sources
+		if(evt.getSource().getClass().getName().endsWith("Level")){
+			delayProperty(evt);
 		}
 
-		if (evt.getPropertyName().equals("Level")) {			
-			levelProperty(evt);	
-		}*/
 	} 
 
 	private synchronized void startWait(String Task, int time)
@@ -110,9 +84,9 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 
 	public void actionPerformed(ActionEvent e) {
 		//OLD		
-		if (DG645Control.dg645.isMoving == true)  {
+		/*if (DG645Control.dg645.isMoving == true)  {
 			return;
-		}
+		}*/
 
 		/*if (e.getActionCommand().startsWith("Exit")) {
 			System.exit(0);
@@ -138,19 +112,19 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 		//END OLD
 
 		//new
-		if (e.getActionCommand().startsWith("Trigger")) {		
+		if (e.getSource().getClass().getName().endsWith("Trigger")) {		
 			triggerAction(e);	
 		}
 
-		if (e.getActionCommand().startsWith("Burst")) {			
+		if (e.getSource().getClass().getName().endsWith("Burst")) {			
 			burstAction(e);
 		}
 
-		if (e.getActionCommand().startsWith("Delay")) {		
+		if (e.getSource().getClass().getName().endsWith("Delay")) {		
 			delayAction(e);	
 		}
 
-		if (e.getActionCommand().startsWith("Level")) {			
+		if (e.getSource().getClass().getName().endsWith("Level")) {			
 			levelAction(e);
 		}
 	}
@@ -175,23 +149,23 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 		try{
 			//trigger(String mode, String rate, String threshold, String advmode, String hold, String edge, String prescale, String phase)
 
-			if(evt.getSource().equals(miGui.buttonInt))
+			if(evt.getSource().equals(miGui.panelTrigger.buttonInt))
 				DG645Control.dg645.trigger("0", null, null, null, null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonExtR))
+			else if(evt.getSource().equals(miGui.panelTrigger.buttonExtR))
 				DG645Control.dg645.trigger("1", null, null, null, null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonExtF))
+			else if(evt.getSource().equals(miGui.panelTrigger.buttonExtF))
 				DG645Control.dg645.trigger("2", null, null, null, null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonSnglExtR))
+			else if(evt.getSource().equals(miGui.panelTrigger.buttonSnglExtR))
 				DG645Control.dg645.trigger("3", null, null, null, null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonSnglExtF))
+			else if(evt.getSource().equals(miGui.panelTrigger.buttonSnglExtF))
 				DG645Control.dg645.trigger("4", null, null, null, null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonSngl))
+			else if(evt.getSource().equals(miGui.panelTrigger.buttonSngl))
 				DG645Control.dg645.trigger("5", null, null, null, null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonLine))
+			else if(evt.getSource().equals(miGui.panelTrigger.buttonLine))
 				DG645Control.dg645.trigger("6", null, null, null, null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonTrigOn))
+			else if(evt.getSource().equals(miGui.panelTrigger.buttonTrigOn))
 				DG645Control.dg645.trigger(null, null, null, "1", null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonTrigOff))
+			else if(evt.getSource().equals(miGui.panelTrigger.buttonTrigOff))
 				DG645Control.dg645.trigger(null, null, null, "0", null, null, null, null);
 			else
 				System.out.println("Error: Unknown trigger action source.");
@@ -204,56 +178,55 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 		//trigger(String mode, String rate, String threshold, String advmode, String hold, String edge, String prescale, String phase)
 
 		try{
-			System.out.println("At trigger property");
-			if(evt.getSource().equals(miGui.txtTrigRate)){
-				DG645Control.dg645.trigger(null, miGui.txtTrigRate.getValue().toString(), null, null, null, null, null, null);
+			if(evt.getSource().equals(miGui.panelTrigger.txtTrigRate)){
+				DG645Control.dg645.trigger(null, miGui.panelTrigger.txtTrigRate.getValue().toString(), null, null, null, null, null, null);
 			}
-			else if(evt.getSource().equals(miGui.txtTrigThres)){
-				DG645Control.dg645.trigger(null, null, miGui.txtTrigThres.getValue().toString(), null, null, null, null, null);
+			else if(evt.getSource().equals(miGui.panelTrigger.txtTrigThres)){
+				DG645Control.dg645.trigger(null, null, miGui.panelTrigger.txtTrigThres.getValue().toString(), null, null, null, null, null);
 			}
-			else if(evt.getSource().equals(miGui.txtHold)){
-				System.out.println("txthold " + miGui.txtHold.getValue().toString());
-				DG645Control.dg645.trigger(null, null, null, null, miGui.txtHold.getValue().toString(), null, null, null);
+			else if(evt.getSource().equals(miGui.panelTrigger.txtHold)){
+				System.out.println("txthold " + miGui.panelTrigger.txtHold.getValue().toString());
+				DG645Control.dg645.trigger(null, null, null, null, miGui.panelTrigger.txtHold.getValue().toString(), null, null, null);
 			}                                  
-			else if(evt.getSource().equals(miGui.txtTrigPres)){
-				DG645Control.dg645.trigger(null, null, null, null, null, "0", miGui.txtTrigPres.getValue().toString().replace(",", ""), null);
+			else if(evt.getSource().equals(miGui.panelTrigger.txtTrigPres)){
+				DG645Control.dg645.trigger(null, null, null, null, null, "0", miGui.panelTrigger.txtTrigPres.getValue().toString().replace(",", ""), null);
 			}
-			else if(evt.getSource().equals(miGui.txtABpres)){
-				DG645Control.dg645.trigger(null, null, null, null, null, "1", miGui.txtABpres.getValue().toString().replace(",", ""), null);
+			else if(evt.getSource().equals(miGui.panelTrigger.txtABpres)){
+				DG645Control.dg645.trigger(null, null, null, null, null, "1", miGui.panelTrigger.txtABpres.getValue().toString().replace(",", ""), null);
 			}
-			else if(evt.getSource().equals(miGui.txtCDpres)){	
-				DG645Control.dg645.trigger(null, null, null, null, null, "2", miGui.txtCDpres.getValue().toString().replace(",", ""), null);
+			else if(evt.getSource().equals(miGui.panelTrigger.txtCDpres)){	
+				DG645Control.dg645.trigger(null, null, null, null, null, "2", miGui.panelTrigger.txtCDpres.getValue().toString().replace(",", ""), null);
 			}
-			else if(evt.getSource().equals(miGui.txtEFpres)){
-				DG645Control.dg645.trigger(null, null, null, null, null, "3", miGui.txtEFpres.getValue().toString().replace(",", ""), null);
+			else if(evt.getSource().equals(miGui.panelTrigger.txtEFpres)){
+				DG645Control.dg645.trigger(null, null, null, null, null, "3", miGui.panelTrigger.txtEFpres.getValue().toString().replace(",", ""), null);
 			}
-			else if(evt.getSource().equals(miGui.txtGHpres)){
-				DG645Control.dg645.trigger(null, null, null, null, null, "4", miGui.txtGHpres.getValue().toString().replace(",", ""), null);
+			else if(evt.getSource().equals(miGui.panelTrigger.txtGHpres)){
+				DG645Control.dg645.trigger(null, null, null, null, null, "4", miGui.panelTrigger.txtGHpres.getValue().toString().replace(",", ""), null);
 			}
-			else if(evt.getSource().equals(miGui.txtABphase)){
-				DG645Control.dg645.trigger(null, null, null, null, null, "1", null, miGui.txtABphase.getValue().toString().replace(",", ""));
+			else if(evt.getSource().equals(miGui.panelTrigger.txtABphase)){
+				DG645Control.dg645.trigger(null, null, null, null, null, "1", null, miGui.panelTrigger.txtABphase.getValue().toString().replace(",", ""));
 			}
-			else if(evt.getSource().equals(miGui.txtCDphase)){
-				DG645Control.dg645.trigger(null, null, null, null, null, "2", null, miGui.txtCDphase.getValue().toString().replace(",", ""));
+			else if(evt.getSource().equals(miGui.panelTrigger.txtCDphase)){
+				DG645Control.dg645.trigger(null, null, null, null, null, "2", null, miGui.panelTrigger.txtCDphase.getValue().toString().replace(",", ""));
 			}
-			else if(evt.getSource().equals(miGui.txtEFphase)){
-				DG645Control.dg645.trigger(null, null, null, null, null, "3", null, miGui.txtEFphase.getValue().toString().replace(",", ""));
+			else if(evt.getSource().equals(miGui.panelTrigger.txtEFphase)){
+				DG645Control.dg645.trigger(null, null, null, null, null, "3", null, miGui.panelTrigger.txtEFphase.getValue().toString().replace(",", ""));
 			}
-			else if(evt.getSource().equals(miGui.txtGHphase)){
-				DG645Control.dg645.trigger(null, null, null, null, null, "4", null, miGui.txtGHphase.getValue().toString().replace(",", ""));
+			else if(evt.getSource().equals(miGui.panelTrigger.txtGHphase)){
+				DG645Control.dg645.trigger(null, null, null, null, null, "4", null, miGui.panelTrigger.txtGHphase.getValue().toString().replace(",", ""));
 			}
 			else
 				System.out.println("Error: Unknown trigger property source.");
-		}catch(Exception e) {System.out.println("what");}
+		}catch(Exception e) {}
 		
 	}
 
 	public void delayAction(java.awt.event.ActionEvent evt)
 	{
 		//delay(String delayChannel, String linkChannel, String value)
-		if(evt.getSource().equals(miGui.cboxChannelA)){
+		if(evt.getSource().equals(miGui.panelDelay.cboxChannelA)){
 			try{
-				int index = miGui.cboxChannelA.getSelectedIndex();
+				int index = miGui.panelDelay.cboxChannelA.getSelectedIndex();
 
 				if(index < 1)
 					DG645Control.dg645.delay("2", String.valueOf(index), null);
@@ -261,13 +234,13 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 					DG645Control.dg645.delay("2", String.valueOf(index+2), null);
 
 				miGui.checkError();
-				miGui.updateDelays("2");
+				miGui.panelDelay.updateDelays("2");
 
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.cboxChannelB)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxChannelB)){
 			try{
-				int index = miGui.cboxChannelB.getSelectedIndex();
+				int index = miGui.panelDelay.cboxChannelB.getSelectedIndex();
 				if(index == 0)
 					DG645Control.dg645.delay("3", String.valueOf(index), null);
 				else if(index < 2)
@@ -277,12 +250,12 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 
 				miGui.checkError();
 
-				miGui.updateDelays("3");
+				miGui.panelDelay.updateDelays("3");
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.cboxChannelC)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxChannelC)){
 			try{
-				int index = miGui.cboxChannelC.getSelectedIndex();
+				int index = miGui.panelDelay.cboxChannelC.getSelectedIndex();
 				if(index == 0)
 					DG645Control.dg645.delay("4", String.valueOf(index), null);
 				else if(index < 3)
@@ -291,12 +264,12 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 					DG645Control.dg645.delay("4", String.valueOf(index+2), null);
 
 				miGui.checkError();    
-				miGui.updateDelays("4");
+				miGui.panelDelay.updateDelays("4");
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.cboxChannelD)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxChannelD)){
 			try{
-				int index = miGui.cboxChannelD.getSelectedIndex();
+				int index = miGui.panelDelay.cboxChannelD.getSelectedIndex();
 				if(index == 0)
 					DG645Control.dg645.delay("5", String.valueOf(index), null);
 				else if(index < 4)
@@ -305,12 +278,12 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 					DG645Control.dg645.delay("5", String.valueOf(index+2), null);
 
 				miGui.checkError();
-				miGui.updateDelays("5");
+				miGui.panelDelay.updateDelays("5");
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.cboxChannelE)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxChannelE)){
 			try{
-				int index = miGui.cboxChannelE.getSelectedIndex();
+				int index = miGui.panelDelay.cboxChannelE.getSelectedIndex();
 				if(index == 0)
 					DG645Control.dg645.delay("6", String.valueOf(index), null);
 				else if(index < 5)
@@ -319,12 +292,12 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 					DG645Control.dg645.delay("6", String.valueOf(index+2), null);
 
 				miGui.checkError();
-				miGui.updateDelays("6");
+				miGui.panelDelay.updateDelays("6");
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.cboxChannelF)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxChannelF)){
 			try{
-				int index = miGui.cboxChannelF.getSelectedIndex();
+				int index = miGui.panelDelay.cboxChannelF.getSelectedIndex();
 				if(index == 0)
 					DG645Control.dg645.delay("7", String.valueOf(index), null);
 				else if(index < 6)
@@ -333,12 +306,12 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 					DG645Control.dg645.delay("7", String.valueOf(index+2), null);
 
 				miGui.checkError();
-				miGui.updateDelays("7");
+				miGui.panelDelay.updateDelays("7");
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.cboxChannelG)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxChannelG)){
 			try{
-				int index = miGui.cboxChannelG.getSelectedIndex();
+				int index = miGui.panelDelay.cboxChannelG.getSelectedIndex();
 				if(index == 0)
 					DG645Control.dg645.delay("8", String.valueOf(index), null);
 				else if(index < 7)
@@ -347,12 +320,12 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 					DG645Control.dg645.delay("8", String.valueOf(index+2), null);
 
 				miGui.checkError();
-				miGui.updateDelays("8");
+				miGui.panelDelay.updateDelays("8");
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.cboxChannelH)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxChannelH)){
 			try{
-				int index = miGui.cboxChannelH.getSelectedIndex();
+				int index = miGui.panelDelay.cboxChannelH.getSelectedIndex();
 				if(index == 0)
 					DG645Control.dg645.delay("9", String.valueOf(index), null);
 				else if(index < 9)
@@ -361,16 +334,16 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 					DG645Control.dg645.delay("9", String.valueOf(index+2), null);
 
 				miGui.checkError();
-				miGui.updateDelays("9");
+				miGui.panelDelay.updateDelays("9");
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.cboxPMA)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxPMA)){
 			try{
 				DG645Control.dg645.mConn.writeLine("DLAY? 2");
 				String current = DG645Control.dg645.mConn.readLine();
 				String replace = current.substring(0, 2);
 
-				int index = miGui.cboxPMA.getSelectedIndex();
+				int index = miGui.panelDelay.cboxPMA.getSelectedIndex();
 				if(index == 0)
 					replace = replace + "+";
 				else
@@ -380,18 +353,18 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 
 				DG645Control.dg645.delay("2", null, replace);
 
-				miGui.updateT1();
+				miGui.panelDelay.updateT1();
 				miGui.checkError();
 			}catch(Exception e){}
 		} 
-		else if(evt.getSource().equals(miGui.cboxPMB)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxPMB)){
 			try{
 
 				DG645Control.dg645.mConn.writeLine("DLAY? 3");
 				String current = DG645Control.dg645.mConn.readLine();
 				String replace = current.substring(0, 2);
 
-				int index = miGui.cboxPMB.getSelectedIndex();
+				int index = miGui.panelDelay.cboxPMB.getSelectedIndex();
 				if(index == 0)
 					replace = replace + "+";
 				else
@@ -402,18 +375,18 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 				DG645Control.dg645.delay("3", null, replace);
 
 
-				miGui.updateT1();
+				miGui.panelDelay.updateT1();
 				miGui.checkError();  
 			}catch(Exception e){}
 		} 
-		else if(evt.getSource().equals(miGui.cboxPMC)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxPMC)){
 			try{
 
 				DG645Control.dg645.mConn.writeLine("DLAY? 4");
 				String current = DG645Control.dg645.mConn.readLine();
 				String replace = current.substring(0, 2);
 
-				int index = miGui.cboxPMC.getSelectedIndex();
+				int index = miGui.panelDelay.cboxPMC.getSelectedIndex();
 				if(index == 0)
 					replace = replace + "+";
 				else
@@ -424,18 +397,18 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 				DG645Control.dg645.delay("4", null, replace);
 
 
-				miGui.updateT1();
+				miGui.panelDelay.updateT1();
 				miGui.checkError();  
 			}catch(Exception e){}
 		} 
-		else if(evt.getSource().equals(miGui.cboxPMD)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxPMD)){
 			try{
 
 				DG645Control.dg645.mConn.writeLine("DLAY? 5");
 				String current = DG645Control.dg645.mConn.readLine();
 				String replace = current.substring(0, 2);
 
-				int index = miGui.cboxPMD.getSelectedIndex();
+				int index = miGui.panelDelay.cboxPMD.getSelectedIndex();
 				if(index == 0)
 					replace = replace + "+";
 				else
@@ -446,18 +419,18 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 				DG645Control.dg645.delay("5", null, replace);
 
 
-				miGui.updateT1();
+				miGui.panelDelay.updateT1();
 				miGui.checkError();
 			}catch(Exception e){}
 		} 
-		else if(evt.getSource().equals(miGui.cboxPME)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxPME)){
 			try{
 
 				DG645Control.dg645.mConn.writeLine("DLAY? 6");
 				String current = DG645Control.dg645.mConn.readLine();
 				String replace = current.substring(0, 2);
 
-				int index = miGui.cboxPME.getSelectedIndex();
+				int index = miGui.panelDelay.cboxPME.getSelectedIndex();
 				if(index == 0)
 					replace = replace + "+";
 				else
@@ -468,18 +441,18 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 				DG645Control.dg645.delay("6", null, replace);
 
 
-				miGui.updateT1();
+				miGui.panelDelay.updateT1();
 				miGui.checkError();
 			}catch(Exception e){}
 		} 
-		else if(evt.getSource().equals(miGui.cboxPMF)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxPMF)){
 			try{
 
 				DG645Control.dg645.mConn.writeLine("DLAY? 7");
 				String current = DG645Control.dg645.mConn.readLine();
 				String replace = current.substring(0, 2);
 
-				int index = miGui.cboxPMF.getSelectedIndex();
+				int index = miGui.panelDelay.cboxPMF.getSelectedIndex();
 				if(index == 0)
 					replace = replace + "+";
 				else
@@ -490,18 +463,18 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 				DG645Control.dg645.delay("7", null, replace);
 
 
-				miGui.updateT1();
+				miGui.panelDelay.updateT1();
 				miGui.checkError();  
 			}catch(Exception e){}
 		}  
-		else if(evt.getSource().equals(miGui.cboxPMG)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxPMG)){
 			try{
 
 				DG645Control.dg645.mConn.writeLine("DLAY? 8");
 				String current = DG645Control.dg645.mConn.readLine();
 				String replace = current.substring(0, 2);
 
-				int index = miGui.cboxPMG.getSelectedIndex();
+				int index = miGui.panelDelay.cboxPMG.getSelectedIndex();
 				if(index == 0)
 					replace = replace + "+";
 				else
@@ -512,19 +485,19 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 				DG645Control.dg645.delay("8", null, replace);
 
 
-				miGui.updateT1();
+				miGui.panelDelay.updateT1();
 				miGui.checkError();
 
 			}catch(Exception e){}
 		} 
-		else if(evt.getSource().equals(miGui.cboxPMH)){
+		else if(evt.getSource().equals(miGui.panelDelay.cboxPMH)){
 			try{
 
 				DG645Control.dg645.mConn.writeLine("DLAY? 9");
 				String current = DG645Control.dg645.mConn.readLine();
 				String replace = current.substring(0, 2);
 
-				int index = miGui.cboxPMH.getSelectedIndex();
+				int index = miGui.panelDelay.cboxPMH.getSelectedIndex();
 				if(index == 0)
 					replace = replace + "+";
 				else
@@ -536,7 +509,7 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 				DG645Control.dg645.delay("9", null, replace);
 
 
-				miGui.updateT1();
+				miGui.panelDelay.updateT1();
 				miGui.checkError();
 			}catch(Exception e){}
 		}
@@ -548,74 +521,74 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 	{
 		//delay(String delayChannel, String linkChannel, String value)
 
-		if(evt.getSource().equals(miGui.txtValA)){
+		if(evt.getSource().equals(miGui.panelDelay.txtValA)){
 			try{
 				DG645Control.dg645.mConn.writeLine("DLAY? 2");
-				DG645Control.dg645.delay("2", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.txtValA.getValue());
+				DG645Control.dg645.delay("2", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.panelDelay.txtValA.getValue());
 
-				miGui.updateT1();
+				miGui.panelDelay.updateT1();
 				miGui.checkError();
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.txtValB)){
+		else if(evt.getSource().equals(miGui.panelDelay.txtValB)){
 			try{
 				DG645Control.dg645.mConn.writeLine("DLAY? 3");
 
-				DG645Control.dg645.delay("3", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.txtValB.getValue());
-				miGui.updateT1();        
+				DG645Control.dg645.delay("3", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.panelDelay.txtValB.getValue());
+				miGui.panelDelay.updateT1();        
 				miGui.checkError();   
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.txtValC)){
+		else if(evt.getSource().equals(miGui.panelDelay.txtValC)){
 			try{
 				DG645Control.dg645.mConn.writeLine("DLAY? 4");
 
-				DG645Control.dg645.delay("4", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.txtValC.getValue());
-				miGui.updateT1();      
+				DG645Control.dg645.delay("4", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.panelDelay.txtValC.getValue());
+				miGui.panelDelay.updateT1();      
 				miGui.checkError();   
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.txtValD)){
+		else if(evt.getSource().equals(miGui.panelDelay.txtValD)){
 			try{
 				DG645Control.dg645.mConn.writeLine("DLAY? 5");
 
-				DG645Control.dg645.delay("5", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.txtValD.getValue());
-				miGui.updateT1();     
+				DG645Control.dg645.delay("5", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.panelDelay.txtValD.getValue());
+				miGui.panelDelay.updateT1();     
 				miGui.checkError();    
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.txtValE)){
+		else if(evt.getSource().equals(miGui.panelDelay.txtValE)){
 			try{
 				DG645Control.dg645.mConn.writeLine("DLAY? 6");
 
-				DG645Control.dg645.delay("6", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.txtValE.getValue());
-				miGui.updateT1();     
+				DG645Control.dg645.delay("6", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.panelDelay.txtValE.getValue());
+				miGui.panelDelay.updateT1();     
 				miGui.checkError();    
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.txtValF)){
+		else if(evt.getSource().equals(miGui.panelDelay.txtValF)){
 			try{
 				DG645Control.dg645.mConn.writeLine("DLAY? 7");
-				DG645Control.dg645.delay("7", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.txtValF.getValue());
-				miGui.updateT1();  
+				DG645Control.dg645.delay("7", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.panelDelay.txtValF.getValue());
+				miGui.panelDelay.updateT1();  
 				miGui.checkError();
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.txtValG)){
+		else if(evt.getSource().equals(miGui.panelDelay.txtValG)){
 			try{
 				DG645Control.dg645.mConn.writeLine("DLAY? 8");
 
-				DG645Control.dg645.delay("8", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.txtValG.getValue());
-				miGui.updateT1();  
+				DG645Control.dg645.delay("8", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.panelDelay.txtValG.getValue());
+				miGui.panelDelay.updateT1();  
 				miGui.checkError();  
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.txtValH)){
+		else if(evt.getSource().equals(miGui.panelDelay.txtValH)){
 			try{
 				DG645Control.dg645.mConn.writeLine("DLAY? 9");
 
-				DG645Control.dg645.delay("9", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.txtValH.getValue());
-				miGui.updateT1();   
+				DG645Control.dg645.delay("9", null, DG645Control.dg645.mConn.readLine().substring(0, 3) + miGui.panelDelay.txtValH.getValue());
+				miGui.panelDelay.updateT1();   
 				miGui.checkError();   
 			}catch(Exception e){}
 		}
@@ -628,13 +601,13 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 		try{
 			//burst(String burstStatus, String fireon, String cnt, String period, String delay)
 
-			if(evt.getSource().equals(miGui.buttonOn))
+			if(evt.getSource().equals(miGui.panelBurst.buttonOn))
 				DG645Control.dg645.burst("1", null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonOff))
+			else if(evt.getSource().equals(miGui.panelBurst.buttonOff))
 				DG645Control.dg645.burst("0", null, null, null, null);
-			else if(evt.getSource().equals(miGui.buttonOutputFirst))
+			else if(evt.getSource().equals(miGui.panelBurst.buttonOutputFirst))
 				DG645Control.dg645.burst(null, "1", null, null, null);
-			else if(evt.getSource().equals(miGui.buttonOutputAll))
+			else if(evt.getSource().equals(miGui.panelBurst.buttonOutputAll))
 				DG645Control.dg645.burst(null, "0", null, null, null);
 			else
 				System.out.println("Error: Unknown burst action source.");
@@ -645,20 +618,20 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 	{
 		try{
 			//burst(String burstStatus, String fireon, String cnt, String period, String delay)
-			if(evt.getSource().equals(miGui.txtCNT))
-				DG645Control.dg645.burst(null, null, miGui.txtCNT.getValue().toString().replace(",", ""), null, null);
-			else if(evt.getSource().equals(miGui.txtPeriod))
-				DG645Control.dg645.burst(null, null, null, miGui.txtPeriod.getValue().toString(), null);
-			else if(evt.getSource().equals(miGui.txtDelay)){
+			if(evt.getSource().equals(miGui.panelBurst.txtCNT))
+				DG645Control.dg645.burst(null, null, miGui.panelBurst.txtCNT.getValue().toString().replace(",", ""), null, null);
+			else if(evt.getSource().equals(miGui.panelBurst.txtPeriod))
+				DG645Control.dg645.burst(null, null, null, miGui.panelBurst.txtPeriod.getValue().toString(), null);
+			else if(evt.getSource().equals(miGui.panelBurst.txtDelay)){
 				try{
-					DG645Control.dg645.burst(null, null, null, null, miGui.txtDelay.getValue().toString());
+					DG645Control.dg645.burst(null, null, null, null, miGui.panelBurst.txtDelay.getValue().toString());
 
 					DG645Control.dg645.mConn.writeLine("BURD?");
 
 					String temp = DG645Control.dg645.mConn.readLine().substring(1);
 					temp = ("0.000000000000" + temp).substring(temp.length());
 
-					miGui.txtDelay.setText(temp);
+					miGui.panelBurst.txtDelay.setText(temp);
 				}catch(Exception e){}
 			}
 			else
@@ -671,29 +644,29 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 	{
 		//level(channel, offset, amp, polarity)
 
-		if(evt.getSource().equals(miGui.cboxLevel)){
+		if(evt.getSource().equals(miGui.panelLevel.cboxLevel)){
 			try{
 
-				String index = String.valueOf(miGui.cboxLevel.getSelectedIndex());
+				String index = String.valueOf(miGui.panelLevel.cboxLevel.getSelectedIndex());
 
 				DG645Control.dg645.mConn.writeLine("LAMP? " + index);
-				miGui.txtAmp.setValue(DG645Control.dg645.mConn.readLine().substring(1));
+				miGui.panelLevel.txtAmp.setValue(DG645Control.dg645.mConn.readLine().substring(1));
 				DG645Control.dg645.mConn.writeLine("LOFF? " + index);
-				miGui.txtOffset.setValue(DG645Control.dg645.mConn.readLine());//.substring(1));
+				miGui.panelLevel.txtOffset.setValue(DG645Control.dg645.mConn.readLine());//.substring(1));
 				DG645Control.dg645.mConn.writeLine("LPOL? " + index);
 				if(DG645Control.dg645.mConn.readLine().equals("0")){	
-					miGui.levelPolarity.setSelected(miGui.buttonNeg.getModel(), true);
-					DG645Control.dg645.level(String.valueOf(miGui.cboxLevel.getSelectedIndex()), miGui.txtOffset.getValue().toString(), miGui.txtAmp.getValue().toString(), "0");
+					miGui.panelLevel.levelPolarity.setSelected(miGui.panelLevel.buttonNeg.getModel(), true);
+					DG645Control.dg645.level(String.valueOf(miGui.panelLevel.cboxLevel.getSelectedIndex()), miGui.panelLevel.txtOffset.getValue().toString(), miGui.panelLevel.txtAmp.getValue().toString(), "0");
 				}
 				else{
-					miGui.levelPolarity.setSelected(miGui.buttonPos.getModel(), true);
-					DG645Control.dg645.level(String.valueOf(miGui.cboxLevel.getSelectedIndex()), miGui.txtOffset.getValue().toString(), miGui.txtAmp.getValue().toString(), "1");
+					miGui.panelLevel.levelPolarity.setSelected(miGui.panelLevel.buttonPos.getModel(), true);
+					DG645Control.dg645.level(String.valueOf(miGui.panelLevel.cboxLevel.getSelectedIndex()), miGui.panelLevel.txtOffset.getValue().toString(), miGui.panelLevel.txtAmp.getValue().toString(), "1");
 				}
 			}catch(Exception e){}
 		}
-		else if(evt.getSource().equals(miGui.buttonPos)) 
+		else if(evt.getSource().equals(miGui.panelLevel.buttonPos)) 
 			DG645Control.dg645.level(null, null, null, "1"); 
-		else if(evt.getSource().equals(miGui.buttonNeg))
+		else if(evt.getSource().equals(miGui.panelLevel.buttonNeg))
 			DG645Control.dg645.level(null, null, null, "0"); 
 		else
 			System.out.println("Error: Unknown level action source.");
@@ -702,10 +675,10 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 	public void levelProperty(java.beans.PropertyChangeEvent evt)
 	{
 		//level(channel, offset, amp, polarity)
-		if(evt.getSource().equals(miGui.txtOffset))
-			DG645Control.dg645.level(null, miGui.txtOffset.getValue().toString(), null, null);
-		else if(evt.getSource().equals(miGui.txtAmp))
-			DG645Control.dg645.level(null, null, miGui.txtAmp.getValue().toString(), null);
+		if(evt.getSource().equals(miGui.panelLevel.txtOffset))
+			DG645Control.dg645.level(null, miGui.panelLevel.txtOffset.getValue().toString(), null, null);
+		else if(evt.getSource().equals(miGui.panelLevel.txtAmp))
+			DG645Control.dg645.level(null, null, miGui.panelLevel.txtAmp.getValue().toString(), null);
 		else
 			System.out.println("Error: Unknown level property source.");
 	}
