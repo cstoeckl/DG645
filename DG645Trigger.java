@@ -14,8 +14,10 @@ public class DG645Trigger extends JPanel{
 	private String temp;
 	
 	public DG645Trigger(DG645Gui parent) {
-		this.action = parent.action;
+		//this.action = parent.action;
 		
+		this.action = new DG645Action(parent);
+
 		this.deFont = parent.deFont;
 		this.textHeight = parent.textHeight;
 
@@ -23,23 +25,46 @@ public class DG645Trigger extends JPanel{
 		
 	}
 
-
 	private void triggerPanel()
 	{
 		//initializing necessary variables
 		
+		//trigger mode variables
 		triggerModes = new ButtonGroup();
-		triggerAdv = new ButtonGroup();
+		buttonInt = new JRadioButton();
+		buttonExtR = new JRadioButton();
+		buttonExtF = new JRadioButton();
+		buttonSngl = new JRadioButton();
+		buttonSnglExtR = new JRadioButton();
+		buttonSnglExtF = new JRadioButton();
+		buttonLine = new JRadioButton();
 		
-		txtTrigRate = new JFormattedTextField();
-		txtTrigThres = new JFormattedTextField();
+		panelModes = new JPanel();
+		labelMode = new JLabel();
+		labelInt = new JLabel();
+		labelExt = new JLabel();
+		labelExt2 = new JLabel();
+		labelSnglExt = new JLabel();
+		labelSnglExt2 = new JLabel();
+		labelLine = new JLabel();
+		labelSngl = new JLabel();
+		
+		//adv trigger variables
+		triggerAdv = new ButtonGroup();
 		buttonTrigOn = new JRadioButton();
 		buttonTrigOff = new JRadioButton();
+
 		txtHold = new JFormattedTextField();
-		labelTrigRate = new JLabel();
-		labelTrigThres = new JLabel();
 		labelAdvTrig = new JLabel();
 		labelHold = new JLabel();
+		
+		//trigger rate, threshold
+		txtTrigRate = new JFormattedTextField();
+		txtTrigThres = new JFormattedTextField();
+		labelTrigRate = new JLabel();
+		labelTrigThres = new JLabel();
+		
+		//prescaler variables
 		panelPresConfig = new JPanel();
 		labelPresConfig = new JLabel();
 		labelT2 = new JLabel();
@@ -71,49 +96,34 @@ public class DG645Trigger extends JPanel{
 		txtCDphase = new JFormattedTextField();
 		txtEFphase = new JFormattedTextField();
 		txtGHphase = new JFormattedTextField();
-		panelModes = new JPanel();
-		buttonLine = new JRadioButton();
-		buttonSnglExtF = new JRadioButton();
-		buttonSngl = new JRadioButton();
-		labelMode = new JLabel();
-		labelInt = new JLabel();
-		labelExt = new JLabel();
-		labelExt2 = new JLabel();
-		labelSnglExt = new JLabel();
-		buttonSnglExtR = new JRadioButton();
-		labelSnglExt2 = new JLabel();
-		buttonInt = new JRadioButton();
-		labelLine = new JLabel();
-		labelSngl = new JLabel();
-		buttonExtF = new JRadioButton();
-		buttonExtR = new JRadioButton();
+		
 		separator = new JSeparator();
 		//end variable initialization
-		
-		
 		
 		this.setPreferredSize(new Dimension(1200, 500));
 
 		DG645Control.dg645.mConn.writeLine("TRAT?");
 		temp = DG645Control.dg645.mConn.readLine().substring(1);
-		temp = ("0000.000000" + temp).substring(temp.length());
+		temp = ("000000000000000" + temp).substring(temp.length());
 		try {
-			txtTrigRate.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("####.######")));
+			txtTrigRate.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###,###.######")));
 		} catch (ParseException ex) {
 			ex.printStackTrace();
 		}
 		txtTrigRate.setText(temp);
-		txtTrigRate.setToolTipText("Internal Triggering");
+		txtTrigRate.setToolTipText("Internal Triggering; Range 0.000100 to 10,000,000.000000");
 		txtTrigRate.setAutoscrolls(false);
 		txtTrigRate.setFont(deFont); 
-		txtTrigRate.setPreferredSize(new Dimension(120, textHeight));
+		txtTrigRate.setPreferredSize(new Dimension(150, textHeight));
 		txtTrigRate.addPropertyChangeListener(action);
 
 		DG645Control.dg645.mConn.writeLine("TLVL?");
 		temp = DG645Control.dg645.mConn.readLine(); //.substring(1);
 		//temp = ("0.00" + temp).substring(temp.length());
 		try {
-			txtTrigThres.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("*#.##")));
+			MaskFormatter formatter = new MaskFormatter("*#.##");
+			formatter.setValidCharacters("1234567890.+-");
+			txtTrigThres.setFormatterFactory(new DefaultFormatterFactory(formatter));
 		} catch (ParseException ex) {
 			ex.printStackTrace();
 		}
@@ -121,7 +131,6 @@ public class DG645Trigger extends JPanel{
 		txtTrigThres.setToolTipText("External Triggering; Range -3.50 to +3.50");
 		txtTrigThres.setFont(deFont); 
 		txtTrigThres.setPreferredSize(new Dimension(60, textHeight));
-		txtTrigThres.setRequestFocusEnabled(false);
 		txtTrigThres.addPropertyChangeListener(action);
 
 		triggerAdv.add(buttonTrigOn);
@@ -232,7 +241,6 @@ public class DG645Trigger extends JPanel{
 		txtTrigPres.setFont(deFont); 
 		txtTrigPres.setPreferredSize(new Dimension(150, textHeight));
 		txtTrigPres.addPropertyChangeListener(action);
-		
 
 		labelEdge.setFont(deFont); 
 		labelEdge.setText("Edge");
@@ -515,42 +523,8 @@ public class DG645Trigger extends JPanel{
 																												.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 
-		triggerModes.add(buttonLine);
-		buttonLine.setFont(deFont); 
-		buttonLine.setText("LINE");
-		buttonLine.setPreferredSize(new Dimension(120, textHeight));
-		buttonLine.addActionListener(action);
-		DG645Control.dg645.mConn.writeLine("TSRC?");
-		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
-		case 0: triggerModes.setSelected(buttonInt.getModel(), true);
-		break;
-		case 1: triggerModes.setSelected(buttonExtR.getModel(), true);
-		break;
-		case 2: triggerModes.setSelected(buttonExtF.getModel(), true);
-		break;
-		case 3: triggerModes.setSelected(buttonSnglExtR.getModel(), true);
-		break;
-		case 4: triggerModes.setSelected(buttonSnglExtF.getModel(), true);
-		break;
-		case 5: triggerModes.setSelected(buttonSngl.getModel(), true);
-		break;
-		case 6: triggerModes.setSelected(buttonLine.getModel(), true);
-		break;
-		default: System.out.println("Invalid ISRC");
-		}
-
-		triggerModes.add(buttonSnglExtF);
-		buttonSnglExtF.setFont(deFont); 
-		buttonSnglExtF.setText("SNGL EXT ↓");
-		buttonSnglExtF.setPreferredSize(new Dimension(120, textHeight));
-		buttonSnglExtF.addActionListener(action);
-
-		triggerModes.add(buttonSngl);
-		buttonSngl.setFont(deFont); 
-		buttonSngl.setText("SNGL");
-		buttonSngl.setPreferredSize(new Dimension(120, textHeight));
-		buttonSngl.addActionListener(action);
-
+	
+		//labels for mode buttons
 		labelMode.setFont(new Font("Tahoma", 1, 14)); 
 		labelMode.setText("Select Mode");
 		labelMode.setPreferredSize(new Dimension(100, textHeight));
@@ -558,7 +532,6 @@ public class DG645Trigger extends JPanel{
 		labelInt.setFont(deFont); 
 		labelInt.setText("Internal triggering at rates from 100 uHz to MHz");
 		labelInt.setPreferredSize(new Dimension(300, textHeight));
-		labelInt.setRequestFocusEnabled(false);
 
 		labelExt.setFont(deFont); 
 		labelExt.setText("External triggering on rising edges");
@@ -568,46 +541,78 @@ public class DG645Trigger extends JPanel{
 		labelExt2.setText("External triggering on falling edges");
 		labelExt2.setPreferredSize(new Dimension(300, textHeight));
 
+		labelSngl.setFont(deFont); 
+		labelSngl.setText("Single shot triggering");
+		labelSngl.setPreferredSize(new Dimension(300, textHeight));
+		
 		labelSnglExt.setFont(deFont); 
 		labelSnglExt.setText("Externally triggered single shot on a rising edge");
 		labelSnglExt.setPreferredSize(new Dimension(300, textHeight));
+		
+		labelSnglExt2.setFont(deFont); 
+		labelSnglExt2.setText("Externally triggered single shot on a falling edge");
+		labelSnglExt2.setPreferredSize(new Dimension(300, textHeight));
+		
+		labelLine.setFont(deFont); 
+		labelLine.setText("Trigger at the power line frequency");
+		labelLine.setPreferredSize(new Dimension(300, textHeight));
+
+		//setting mode buttons and adding to button group
+		triggerModes.add(buttonInt);
+		buttonInt.setFont(deFont); 
+		buttonInt.setText("INT");
+		buttonInt.setPreferredSize(new Dimension(120, textHeight));
+		buttonInt.addActionListener(action);
+		
+		triggerModes.add(buttonExtR);
+		buttonExtR.setFont(deFont); 
+		buttonExtR.setText("EXT ↑");
+		buttonExtR.setPreferredSize(new Dimension(120, textHeight));
+		buttonExtR.addActionListener(action);
+		
+		triggerModes.add(buttonExtF);
+		buttonExtF.setFont(deFont); 
+		buttonExtF.setText("EXT ↓");
+		buttonExtF.setPreferredSize(new Dimension(120, textHeight));
+		buttonExtF.addActionListener(action);
+		
+		triggerModes.add(buttonSngl);
+		buttonSngl.setFont(deFont); 
+		buttonSngl.setText("SNGL");
+		buttonSngl.setPreferredSize(new Dimension(120, textHeight));
+		buttonSngl.addActionListener(action);
 
 		triggerModes.add(buttonSnglExtR);
 		buttonSnglExtR.setFont(deFont); 
 		buttonSnglExtR.setText("SNGL EXT ↑");
 		buttonSnglExtR.setPreferredSize(new Dimension(120, textHeight));
 		buttonSnglExtR.addActionListener(action);
+		
+		triggerModes.add(buttonSnglExtF);
+		buttonSnglExtF.setFont(deFont); 
+		buttonSnglExtF.setText("SNGL EXT ↓");
+		buttonSnglExtF.setPreferredSize(new Dimension(120, textHeight));
+		buttonSnglExtF.addActionListener(action);
+		
+		triggerModes.add(buttonLine);
+		buttonLine.setFont(deFont); 
+		buttonLine.setText("LINE");
+		buttonLine.setPreferredSize(new Dimension(120, textHeight));
+		buttonLine.addActionListener(action);
 
-		labelSnglExt2.setFont(deFont); 
-		labelSnglExt2.setText("Externally triggered single shot on a falling edge");
-		labelSnglExt2.setPreferredSize(new Dimension(300, textHeight));
-
-		triggerModes.add(buttonInt);
-		buttonInt.setFont(deFont); 
-		buttonInt.setText("INT");
-		buttonInt.setPreferredSize(new Dimension(120, textHeight));
-		buttonInt.addActionListener(action);
-
-		labelLine.setFont(deFont); 
-		labelLine.setText("Trigger at the power line frequency");
-		labelLine.setPreferredSize(new Dimension(300, textHeight));
-
-		labelSngl.setFont(deFont); 
-		labelSngl.setText("Single shot triggering");
-		labelSngl.setPreferredSize(new Dimension(300, textHeight));
-
-		triggerModes.add(buttonExtF);
-		buttonExtF.setFont(deFont); 
-		buttonExtF.setText("EXT ↓");
-		buttonExtF.setPreferredSize(new Dimension(120, textHeight));
-		buttonExtF.addActionListener(action);
-
-		triggerModes.add(buttonExtR);
-		buttonExtR.setFont(deFont); 
-		buttonExtR.setText("EXT ↑");
-		buttonExtR.setPreferredSize(new Dimension(120, textHeight));
-		buttonExtR.addActionListener(action);
-
+		//initial selected mode
+		DG645Control.dg645.mConn.writeLine("TSRC?");
+		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
+		case 0: triggerModes.setSelected(buttonInt.getModel(), true); break;
+		case 1: triggerModes.setSelected(buttonExtR.getModel(), true); break;
+		case 2: triggerModes.setSelected(buttonExtF.getModel(), true); break;
+		case 3: triggerModes.setSelected(buttonSnglExtR.getModel(), true); break;
+		case 4: triggerModes.setSelected(buttonSnglExtF.getModel(), true); break;
+		case 5: triggerModes.setSelected(buttonSngl.getModel(), true); break;
+		case 6: triggerModes.setSelected(buttonLine.getModel(), true); break;
+		default: System.out.println("Invalid ISRC");
+		}
+		
 		GroupLayout panelModesLayout = new GroupLayout(panelModes);
 		panelModes.setLayout(panelModesLayout);
 		panelModesLayout.setHorizontalGroup(
@@ -752,57 +757,6 @@ public class DG645Trigger extends JPanel{
 	public JRadioButton buttonTrigOff;
 	public JRadioButton buttonTrigOn;
 	
-	
-	private JLabel labelA1;
-	private JLabel labelABphase;
-	private JLabel labelABpres;
-	private JLabel labelAdvTrig;
-	
-	
-	private JLabel labelB1;
-	
-	
-	private JLabel labelC1;
-	private JLabel labelCDphase;
-	private JLabel labelCDpres;
-	
-	private JLabel labelD1;
-	
-	private JLabel labelE1;
-	private JLabel labelEFphase;
-	private JLabel labelEFpres;
-	
-
-	private JLabel labelEdge;
-	private JLabel labelEdge2;
-	private JLabel labelExt;
-	private JLabel labelExt2;
-	private JLabel labelF1;
-	private JLabel labelG1;
-	private JLabel labelGHphase;
-	private JLabel labelGHpres;
-	
-
-	
-	private JLabel labelH1;
-	private JLabel labelHold;
-	
-
-	private JLabel labelInt;
-	private JLabel labelLine;
-	private JLabel labelMode;
-	private JLabel labelPresConfig;
-	private JLabel labelSngl;
-	private JLabel labelSnglExt;
-	private JLabel labelSnglExt2;
-	private JLabel labelT2;
-	private JLabel labelTrigPS;
-	private JLabel labelTrigRate;
-	private JLabel labelTrigThres;
-	
-
-	private ButtonGroup triggerAdv;
-	private ButtonGroup triggerModes;
 	public JFormattedTextField txtABphase;
 	public JFormattedTextField txtABpres;
 	public JFormattedTextField txtCDphase;
@@ -816,9 +770,42 @@ public class DG645Trigger extends JPanel{
 	public JFormattedTextField txtTrigRate;
 	public JFormattedTextField txtTrigThres;
 	
+	private JLabel labelA1;
+	private JLabel labelABphase;
+	private JLabel labelABpres;
+	private JLabel labelAdvTrig;
+	private JLabel labelB1;
+	private JLabel labelC1;
+	private JLabel labelCDphase;
+	private JLabel labelCDpres;
+	private JLabel labelD1;
+	private JLabel labelE1;
+	private JLabel labelEFphase;
+	private JLabel labelEFpres;
+	private JLabel labelEdge;
+	private JLabel labelEdge2;
+	private JLabel labelExt;
+	private JLabel labelExt2;
+	private JLabel labelF1;
+	private JLabel labelG1;
+	private JLabel labelGHphase;
+	private JLabel labelGHpres;
+	private JLabel labelH1;
+	private JLabel labelHold;
+	private JLabel labelInt;
+	private JLabel labelLine;
+	private JLabel labelMode;
+	private JLabel labelPresConfig;
+	private JLabel labelSngl;
+	private JLabel labelSnglExt;
+	private JLabel labelSnglExt2;
+	private JLabel labelT2;
+	private JLabel labelTrigPS;
+	private JLabel labelTrigRate;
+	private JLabel labelTrigThres;
+	private ButtonGroup triggerAdv;
+	private ButtonGroup triggerModes;
 	private JPanel panelModes;
 	private JPanel panelPresConfig;
-	
-
 	private JSeparator separator;
 }

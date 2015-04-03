@@ -69,6 +69,7 @@ public class DG645 implements Runnable {
 	{
 		if (!connected) return;
 
+		System.out.println("at dg645 trigger");
 		if(mode != null)
 			this.mode = mode;
 		if(rate != null)
@@ -216,6 +217,7 @@ public class DG645 implements Runnable {
 		} else if(work.getName().equals("Trigger")) { 
 
 			try{
+				System.out.println("rate " + rate);
 				if(mode != null)
 					mConn.writeLine("TSRC " + mode);
 				if(rate != null)
@@ -233,18 +235,34 @@ public class DG645 implements Runnable {
 			}catch(Exception e){};
 
 		} else if(work.getName().equals("Burst")) {
-			mConn.writeLine("BURM " + burstStatus);
-			mConn.writeLine("BURT " + fireon);
-			mConn.writeLine("BURC " + cnt);
-			mConn.writeLine("BURP " + period);
-			mConn.writeLine("BURD " + delay);
+			try{
+				if(burstStatus != null)
+					mConn.writeLine("BURM " + burstStatus);
+				if(fireon != null)
+					mConn.writeLine("BURT " + fireon);
+				if(cnt != null)
+					mConn.writeLine("BURC " + cnt);
+				if(period != null)
+					mConn.writeLine("BURP " + period);
+				if(delay != null)
+					mConn.writeLine("BURD " + delay);
+			}catch(Exception e){};
 		} else if(work.getName().equals("Delay")) {	
-			mConn.writeLine("LINK " + delayChannel + "," + linkChannel);
-			mConn.writeLine("DLAY " + delayChannel + "," + delayVal);
+			try{
+				if(delayChannel != null && linkChannel!= null)
+					mConn.writeLine("LINK " + delayChannel + "," + linkChannel);
+				if(delayChannel != null && delayVal!= null)
+					mConn.writeLine("DLAY " + delayChannel + "," + delayVal);
+			}catch(Exception e){};
 		} else if(work.getName().equals("Level")) {
-			mConn.writeLine("LOFF " + levelChannel + "," + offset);
-			mConn.writeLine("LAMP " + levelChannel + "," + amplitude);
-			mConn.writeLine("LPOL " + levelChannel + "," + polarity); 
+			try{
+				if( levelChannel!= null && offset!= null)
+					mConn.writeLine("LOFF " + levelChannel + "," + offset);
+				if( levelChannel!= null && amplitude!= null)
+					mConn.writeLine("LAMP " + levelChannel + "," + amplitude);
+				if(levelChannel != null && polarity!= null)
+					mConn.writeLine("LPOL " + levelChannel + "," + polarity); 
+			}catch(Exception e){};
 		}
 		else {
 			//			System.out.println("moving");
