@@ -22,6 +22,7 @@ DG645Action action;
 		levelPanel();
 		
 	}
+	
 	private void levelPanel()
 	{
 		//initializing necessary variables

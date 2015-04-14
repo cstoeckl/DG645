@@ -52,6 +52,12 @@ public class DG645Delay extends JPanel {
 		labelT1val.setText(temp);
 	}
 
+	public void updateT1(String delay)
+	{
+		temp = delay.substring(2);
+		labelT1val.setText(temp);
+	}
+	
 	private void delayPanel()
 	{
 		//initializing variables

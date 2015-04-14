@@ -87,6 +87,14 @@ public class DG645 implements Runnable {
 		if(phase != null)
 			this.phase = phase;
 
+		System.out.println("mode " + this.mode);
+		System.out.println("rate " + this.rate);
+		System.out.println("threshold " + this.threshold);
+		System.out.println("advmode " + this.advmode);
+		System.out.println("hold " + this.hold);
+		System.out.println("edge " + this.edge);
+		System.out.println("prescale " + this.prescale);
+		System.out.println("phase " + this.phase);
 		work = new Thread(this,"Trigger");
 		isMoving = true;
 		work.start(); 	
@@ -107,11 +115,23 @@ public class DG645 implements Runnable {
 		if(value != null)
 			this.delayVal = value;
 
+		System.out.println("delayChannel " + this.delayChannel);
+		System.out.println("linkChannel " + this.linkChannel);
+		System.out.println("delayVal " + this.delayVal);
+		
 		work = new Thread(this,"Delay");
 		isMoving = true;
 		work.start(); 	
 	}
 
+	public void delay(String delayChannel, Object value)
+	{
+		mConn.writeLine("DLAY? " + delayChannel);
+		String temp = mConn.readLine();
+		
+		delay(delayChannel, null, temp.substring(0, 3)+value);
+	}
+	
 	public void burst(String burstStatus, String fireon, String cnt, String period, String delay)
 	{
 		if (!connected) return;
@@ -127,6 +147,13 @@ public class DG645 implements Runnable {
 		if(delay != null)
 			this.delay = delay;
 
+
+		System.out.println("burstStatus " + this.burstStatus);
+		System.out.println("fireon " + this.fireon);
+		System.out.println("cnt " + this.cnt);
+		System.out.println("period " + this.period);
+		System.out.println("delay " + this.delay);
+		
 		work = new Thread(this,"Burst");
 		isMoving = true;
 		work.start(); 	
@@ -145,6 +172,12 @@ public class DG645 implements Runnable {
 		if(polarity != null)
 			this.polarity = polarity;
 
+
+		System.out.println("levelChannel " + this.levelChannel);
+		System.out.println("offset " + this.offset);
+		System.out.println("amplitude " + this.amplitude);
+		System.out.println("polarity " + this.polarity);
+		
 		work = new Thread(this,"Level");
 		isMoving = true;
 		work.start(); 	
@@ -196,23 +229,11 @@ public class DG645 implements Runnable {
 	{		
 		if (work.getName().startsWith("Connecting")) {
 			mConn = new DeviceConnection(host,port,System.out); 
+			DG645Control.dg645.mConn.writeLine("*CLS");	//Clears ESR, INSR, and LERR
 			mConn.writeLine("*IDN?");
 			tmp = mConn.readLine();
 			System.out.println("reply: "+ tmp);
-			Pos = 0.0;
 			connected = true;
-			isMoving = false;
-
-		} else if (work.getName().equals("Init")) {
-			mConn.writeLine("del?");
-			tmp = mConn.readLine();
-			//			System.out.println("reply: "+ tmp);
-			Pos = Double.parseDouble(tmp)/1e-9;
-			mConn.writeLine("rel?");
-			tmp = mConn.readLine();
-			System.out.println("reply: "+ tmp);
-			relais = tmp;
-			initialized = true;
 			isMoving = false;
 		} else if(work.getName().equals("Trigger")) { 
 
@@ -265,7 +286,7 @@ public class DG645 implements Runnable {
 			}catch(Exception e){};
 		}
 		else {
-			//			System.out.println("moving");
+			//System.out.println("moving");
 			isMoving = false;	
 		}
 		workDone();
