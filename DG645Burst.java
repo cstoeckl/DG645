@@ -20,12 +20,9 @@ DG645Action action;
 		this.deFont = parent.deFont;
 		this.textHeight = parent.textHeight;
 
-		
 		burstPanel();
 		
 	}
-	
-
 	
 	private void burstPanel()
 	{

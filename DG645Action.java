@@ -37,22 +37,6 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
-		/*if (evt.getPropertyName().equals("edited") &&
-				DG645Control.dg645.initialized == true) {
-			miGui.lockControls();
-			miGui.moveButton.setEnabled(true);
-			miGui.moveButton.setBackground(Color.GREEN);
-		}
-		if (evt.getPropertyName().equals("stepping")) {
-			//			System.out.println("stepping");
-			double P = miGui.Pos.value;
-			DG645Control.dg645.step(P);
-			miGui.updateControls();
-		}*/
-		//END OLD
-
-		//new
-
 		//check for all trigger sources
 		//if(evt.getSource().getClass().getName().endsWith("Trigger")){
 		triggerProperty(evt);
@@ -83,35 +67,7 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		//OLD		
-		/*if (DG645Control.dg645.isMoving == true)  {
-			return;
-		}*/
-
-		/*if (e.getActionCommand().startsWith("Exit")) {
-			System.exit(0);
-		}		
-		if (e.getActionCommand().startsWith("Init")) {
-			miGui.Pos.setValue(0.0); 
-			startWait("Init",5);			
-			DG645Control.dg645.init();	
-		}		
-		if (e.getActionCommand().startsWith("Stop")) {
-			DG645Control.dg645.stop();
-			miGui.updateControls();
-		}		
-		if (e.getActionCommand().startsWith("Move")) {
-			miGui.moveButton.setBackground(Color.RED);
-			double P = miGui.Pos.value;
-			startWait("Move",5);	
-			DG645Control.dg645.move(P);
-		}	
-		if (e.getActionCommand().startsWith("Settings")) {
-			miGui.settingsDialog.setVisible(true);
-		}	*/
-		//END OLD
-
-		System.out.println("at dg645 action");
+		/*System.out.println("at dg645 action");
 
 		System.out.println(e.getSource().getClass().getName());
 
@@ -122,12 +78,11 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 		System.out.println("id" + e.getID());
 		System.out.println("modifier" + e.getModifiers());
 
-		System.out.println("when" + e.getWhen());
+		System.out.println("when" + e.getWhen());*/
 
+		//if(e.getSource().equals(miGui.menuSettings));
+		//	miGui.settingsDialog.setVisible(true);
 
-
-
-		//new
 		//if (e.getSource().getClass().getName().endsWith("Trigger")) {
 		triggerAction(e);	
 		//}
@@ -194,11 +149,14 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 		//trigger(String mode, String rate, String threshold, String advmode, String hold, String edge, String prescale, String phase)
 		try{
 			if(evt.getSource().equals(miGui.panelTrigger.txtTrigRate)){
-				System.out.println("txtTrigrate " +miGui.panelTrigger.txtTrigRate.getValue().toString() );
+				System.out.println("txtTrigrate " + miGui.panelTrigger.txtTrigRate.getValue().toString() );
 				DG645Control.dg645.trigger(null, miGui.panelTrigger.txtTrigRate.getValue().toString(), null, null, null, null, null, null);
 			}
 			else if(evt.getSource().equals(miGui.panelTrigger.txtTrigThres)){
-				DG645Control.dg645.trigger(null, null, miGui.panelTrigger.txtTrigThres.getValue().toString(), null, null, null, null, null);
+				String temp = miGui.panelTrigger.txtTrigThres.getValue().toString();
+				if(temp.startsWith("+"))
+					temp = temp.substring(1, temp.length());
+				DG645Control.dg645.trigger(null, null, temp, null, null, null, null, null);
 			}
 			else if(evt.getSource().equals(miGui.panelTrigger.txtHold)){
 				System.out.println("txthold " + miGui.panelTrigger.txtHold.getValue().toString());
@@ -360,7 +318,6 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 			else if(evt.getSource().equals(miGui.panelBurst.txtPeriod))
 				DG645Control.dg645.burst(null, null, null, miGui.panelBurst.txtPeriod.getValue().toString(), null);
 			else if(evt.getSource().equals(miGui.panelBurst.txtDelay)){
-				try{
 					DG645Control.dg645.burst(null, null, null, null, miGui.panelBurst.txtDelay.getValue().toString());
 
 					DG645Control.dg645.mConn.writeLine("BURD?");
@@ -369,7 +326,6 @@ public class DG645Action implements Runnable, PropertyChangeListener, ActionList
 					temp = ("0.000000000000" + temp).substring(temp.length());
 
 					miGui.panelBurst.txtDelay.setText(temp);
-				}catch(Exception e){}
 			}
 			else {}
 			//System.out.println("Error: Unknown burst property source.");

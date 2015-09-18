@@ -18,8 +18,8 @@ public class DG645 implements Runnable {
 
 	public DeviceConnection mConn=null;
 	private Thread work;
-	private  String host;
-	private int port;
+	public  String host;
+	public int port;
 	private String tmp;
 	private double z;
 	public String relais="000000000000 0.0ns";
@@ -108,17 +108,19 @@ public class DG645 implements Runnable {
 	{
 		if (!connected) return;
 
+		System.out.println("delayVal trsd " + this.delayVal);
+		System.out.println("value " + value);
 		if(delayChannel != null)
 			this.delayChannel = delayChannel;
 		if(linkChannel != null)
 			this.linkChannel = linkChannel;
 		if(value != null)
-			this.delayVal = value;
+			this.delayVal = value.substring(3);
 
 		System.out.println("delayChannel " + this.delayChannel);
 		System.out.println("linkChannel " + this.linkChannel);
-		System.out.println("delayVal " + this.delayVal);
-		
+		System.out.println("delayVal trsd " + this.delayVal);
+
 		work = new Thread(this,"Delay");
 		isMoving = true;
 		work.start(); 	
@@ -128,10 +130,12 @@ public class DG645 implements Runnable {
 	{
 		mConn.writeLine("DLAY? " + delayChannel);
 		String temp = mConn.readLine();
-		
+
+		System.out.println("temp " + temp);
+		System.out.println("temp substring" + temp.substring(0, 3));
 		delay(delayChannel, null, temp.substring(0, 3)+value);
 	}
-	
+
 	public void burst(String burstStatus, String fireon, String cnt, String period, String delay)
 	{
 		if (!connected) return;
@@ -153,7 +157,7 @@ public class DG645 implements Runnable {
 		System.out.println("cnt " + this.cnt);
 		System.out.println("period " + this.period);
 		System.out.println("delay " + this.delay);
-		
+
 		work = new Thread(this,"Burst");
 		isMoving = true;
 		work.start(); 	
@@ -177,7 +181,7 @@ public class DG645 implements Runnable {
 		System.out.println("offset " + this.offset);
 		System.out.println("amplitude " + this.amplitude);
 		System.out.println("polarity " + this.polarity);
-		
+
 		work = new Thread(this,"Level");
 		isMoving = true;
 		work.start(); 	
@@ -227,68 +231,132 @@ public class DG645 implements Runnable {
 
 	public void run() 
 	{		
-		if (work.getName().startsWith("Connecting")) {
-			mConn = new DeviceConnection(host,port,System.out); 
-			DG645Control.dg645.mConn.writeLine("*CLS");	//Clears ESR, INSR, and LERR
-			mConn.writeLine("*IDN?");
-			tmp = mConn.readLine();
-			System.out.println("reply: "+ tmp);
-			connected = true;
-			isMoving = false;
-		} else if(work.getName().equals("Trigger")) { 
-
-			try{
+		try{
+			if (work.getName().startsWith("Connecting")) {
+				mConn = new DeviceConnection(host,port,System.out); 
+				DG645Control.dg645.mConn.writeLine("*CLS");	//Clears ESR, INSR, and LERR
+				mConn.writeLine("*IDN?");
+				tmp = mConn.readLine();
+				System.out.println("reply: "+ tmp);
+				connected = true;
+				isMoving = false;
+			} else if(work.getName().equals("Trigger")) { 
 				System.out.println("rate " + rate);
 				if(mode != null)
+				{
 					mConn.writeLine("TSRC " + mode);
+					mode = null;
+				}
 				if(rate != null)
+				{	
 					mConn.writeLine("TRAT " + rate);
+					rate = null;
+				}
 				if(threshold !=null)
+				{	
 					mConn.writeLine("TLVL," + threshold);
+					threshold = null;
+				}
 				if(advmode !=null)
+				{	
 					mConn.writeLine("ADVT " + advmode);
+					advmode = null;
+				}
 				if(hold !=null)
+				{	
 					mConn.writeLine("HOLD " + hold);
+					hold = null;
+				}
 				if(edge != null && prescale !=null)
+				{	
 					mConn.writeLine("PRES " + edge + "," + prescale); 
+					edge = null;
+					prescale = null;
+				}
 				if(edge != null && phase !=null)
+				{	
 					mConn.writeLine("PHAS " + edge + "," + phase);
-			}catch(Exception e){};
+					edge = null;
+					prescale = null;
+				}
 
-		} else if(work.getName().equals("Burst")) {
-			try{
+			} else if(work.getName().equals("Burst")) {
 				if(burstStatus != null)
+				{	
 					mConn.writeLine("BURM " + burstStatus);
+					burstStatus = null;
+				}
 				if(fireon != null)
+				{	
 					mConn.writeLine("BURT " + fireon);
+					fireon = null;
+				}
 				if(cnt != null)
+				{	
 					mConn.writeLine("BURC " + cnt);
+					cnt = null;
+				}
 				if(period != null)
+				{	
 					mConn.writeLine("BURP " + period);
+					period = null;
+				}
 				if(delay != null)
+				{	
 					mConn.writeLine("BURD " + delay);
-			}catch(Exception e){};
-		} else if(work.getName().equals("Delay")) {	
-			try{
-				if(delayChannel != null && linkChannel!= null)
+					delay = null;
+				}
+			} else if(work.getName().equals("Delay")) {	
+				if(delayChannel != null && linkChannel != null)
+				{	
 					mConn.writeLine("LINK " + delayChannel + "," + linkChannel);
-				if(delayChannel != null && delayVal!= null)
-					mConn.writeLine("DLAY " + delayChannel + "," + delayVal);
-			}catch(Exception e){};
-		} else if(work.getName().equals("Level")) {
-			try{
-				if( levelChannel!= null && offset!= null)
+					delayChannel = null;
+					linkChannel = null;
+				}
+				if(delayChannel != null && delayVal != null)
+				{	
+					mConn.writeLine("DLAY? " + delayChannel);
+					mConn.writeLine("DLAY? 2");
+					System.out.println("delayChannel " + delayChannel + "read: " + mConn.readLine());
+					//if(linkChannel == null)
+						linkChannel = mConn.readLine().substring(0, 1);
+					
+						System.out.println("link " + linkChannel);
+
+						System.out.println("DLAY " + delayChannel + "," + linkChannel + "," + delayVal);
+					mConn.writeLine("DLAY " + delayChannel + "," + linkChannel + "," + delayVal);
+					
+
+					delayChannel = null;
+					delayVal = null;
+				}
+			} else if(work.getName().equals("Level")) {
+
+				if( levelChannel != null && offset != null)
+				{	
 					mConn.writeLine("LOFF " + levelChannel + "," + offset);
-				if( levelChannel!= null && amplitude!= null)
+					levelChannel = null;
+					offset = null;
+				}
+				if( levelChannel != null && amplitude != null)
+				{	
 					mConn.writeLine("LAMP " + levelChannel + "," + amplitude);
-				if(levelChannel != null && polarity!= null)
+					levelChannel = null;
+					amplitude = null;
+				}
+				if(levelChannel != null && polarity != null)
+				{	
 					mConn.writeLine("LPOL " + levelChannel + "," + polarity); 
-			}catch(Exception e){};
-		}
-		else {
-			//System.out.println("moving");
-			isMoving = false;	
-		}
+					levelChannel = null;
+					polarity = null;
+				}
+			}
+			else {
+				//System.out.println("moving");
+				isMoving = false;	
+			}
+		}catch(Exception e){};
+
 		workDone();
 	}
 

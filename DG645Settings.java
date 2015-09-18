@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 /**
  *
@@ -17,17 +18,17 @@ public class DG645Settings extends JDialog implements ActionListener
 {
 	private static final long serialVersionUID = 1L;
 	
-	static Properties microscopeProperties=new Properties();
-    static String file = "Microscope.properties";
+	static Properties generatorProperties=new Properties();
+    static String file = "Generator.properties";
     static final String s = File.separator;
     public JTextField hostField, portField;
     
-    /** Creates new CCDSettings */
+    /** Creates new DG645Settings */
     public DG645Settings(JFrame parent) {
         super(parent);
         this.setTitle("DG645 Control Settings");
         
-        // create panel with border and layout for path infomation
+        // create panel with border and layout for path information
         JPanel pathPane = new JPanel();
         pathPane.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
         pathPane.setLayout(new GridLayout(0, 2));
@@ -36,7 +37,7 @@ public class DG645Settings extends JDialog implements ActionListener
         //text field for host name
         hostField = new JTextField(4);
         hostField.setHorizontalAlignment(JTextField.RIGHT);
-        
+        hostField.setText(DG645Control.dg645.host);
         pathPane.add(new JLabel("Host Name:  "));
         pathPane.add(hostField);
         pathPane.add(new JLabel(""));
@@ -45,7 +46,7 @@ public class DG645Settings extends JDialog implements ActionListener
       //text field for port
         portField = new JTextField(4);
         portField.setHorizontalAlignment(JTextField.RIGHT);
-        
+        portField.setText("" + DG645Control.dg645.port);
         pathPane.add(new JLabel("Port:  "));
         pathPane.add(portField);
         pathPane.add(new JLabel(""));
@@ -65,7 +66,7 @@ public class DG645Settings extends JDialog implements ActionListener
         buttonPane.add(apply);
         buttonPane.add(cancel);
         
-        // create panel with border and layout to put everthing together
+        // create panel with border and layout to put everything together
         JPanel pane = new JPanel();
         pane.setLayout(new BorderLayout());    
         pane.add("Center",pathPane);
@@ -78,9 +79,9 @@ public class DG645Settings extends JDialog implements ActionListener
         try {
             FileInputStream in =
             new FileInputStream(file);
-            microscopeProperties.load(in);
+            generatorProperties.load(in);
             in.close();
-            microscopeProperties.list(System.out);
+            generatorProperties.list(System.out);
         } catch (Exception e0) {};
         
         // set values in dialog
@@ -90,12 +91,12 @@ public class DG645Settings extends JDialog implements ActionListener
         String action = e.getActionCommand();
         
         if (action.startsWith("Apply") || action.startsWith("Ok")) {
-            microscopeProperties.put("Host Name",hostField.getText());
-            microscopeProperties.put("Port",portField.getText());
-            microscopeProperties.list(System.out);
+        	generatorProperties.put("Host Name",hostField.getText());
+        	generatorProperties.put("Port",portField.getText());
+        	generatorProperties.list(System.out);
             try {
                 FileOutputStream out = new FileOutputStream(file);
-                microscopeProperties.store(out,"Scint Properties");
+                generatorProperties.store(out,"DG645 Properties");
                 out.close();
             } catch (IOException e1) {};
         }

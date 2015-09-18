@@ -9,19 +9,18 @@ import lib.TimerLabel;
 public class DG645Gui extends JFrame {
 
 	DG645Action action;
-	
+	DG645Settings settingsDialog;
 	//TimerLabel timerLabel;
-	
+
 	//for uniform style
 	Font deFont = new java.awt.Font("Tahoma", 0, 14);
 	int textHeight = 30;
-	
-	//private DeviceConnection mConn=new DeviceConnection("172.20.34.210",5025,System.out);
+
 	private String temp;
 	private int intemp;
-	
+
 	public boolean initRun = true;
-	
+
 	public void checkError()
 	{
 		if(!initRun)
@@ -50,8 +49,6 @@ public class DG645Gui extends JFrame {
 
 	}
 
-
-	
 	/**
 	 * Creates new form DG645Gui
 	 */
@@ -59,39 +56,37 @@ public class DG645Gui extends JFrame {
 		super("DG645Control");
 
 		action=new DG645Action(this);
-		
-		/*DG645Control.dg645.mConn.writeLine("*CLS");
+		//settingsDialog = new DG645Settings(this);
 
-		DG645Control.dg645.mConn.writeLine("*IDN?"); 
-		System.out.println("reply: "+ DG645Control.dg645.mConn.readLine());*/
+		//settingsDialog.setVisible(true);
 
 		initComponents();
 		initRun = false;
 
 	}
-                         
+
 	private void initComponents()
 	{
 		panelMain = new JPanel();
 		tabPanel = new JTabbedPane();
-		
+
 		//frame
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setTitle("DG645 Settings");
 		setPreferredSize(new java.awt.Dimension(1150, 600));
-		
+
 		//main panel
 		panelMain.setPreferredSize(new java.awt.Dimension(1200, 500));
-		
+
 		//tabbed panel
 		tabPanel.setFont(new java.awt.Font("Tahoma", 0, 16)); 
 		tabPanel.setPreferredSize(new java.awt.Dimension(1200, 500));
-		
+
 		//menu bar
 		menu();
-		
+
 		//add revelant tabs to tabbed panel
-		
+
 		panelTrigger = new DG645Trigger(this);
 		panelBurst = new DG645Burst(this);
 		panelDelay = new DG645Delay(this);
@@ -100,42 +95,42 @@ public class DG645Gui extends JFrame {
 		tabPanel.addTab("Burst", panelBurst);
 		tabPanel.addTab("Delay", panelDelay);
 		tabPanel.addTab("Level", panelLevel);
-		
+
 		//main panel layout
 		GroupLayout panelMainLayout = new GroupLayout(panelMain);
 		panelMain.setLayout(panelMainLayout);
 		panelMainLayout.setHorizontalGroup(
 				panelMainLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addComponent(tabPanel, GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE)
-		);
+				);
 		panelMainLayout.setVerticalGroup(
 				panelMainLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addGroup(panelMainLayout.createSequentialGroup()
 						.addComponent(tabPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGap(0, 0, Short.MAX_VALUE))
-		);
-		
-		
-		
-		
+				);
+
+
+
+
 		//frame layout
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		layout.setHorizontalGroup(
 				layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addComponent(panelMain, GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE)
-		);
+				);
 		layout.setVerticalGroup(
 				layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addComponent(panelMain, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-		);
+				);
 
 		pack();
 	}
-	
+
 	private void menu()
 	{
-		//initializing necessary variabels
+		//initializing necessary variables
 		menuBar = new JMenuBar();
 		menuFile = new JMenu();
 		menuSave = new JMenuItem();
@@ -144,7 +139,7 @@ public class DG645Gui extends JFrame {
 		menuSettings = new JMenuItem();
 		menuView = new JMenu();
 		menuTools = new JMenu();
-		
+
 		menuBar.setFont(new java.awt.Font("Segoe UI", 0, 16)); 
 		menuBar.setPreferredSize(new java.awt.Dimension(1200, 30));
 
@@ -163,7 +158,7 @@ public class DG645Gui extends JFrame {
 		menuEdit.setText("Edit");
 
 		menuSettings.setText("Settings");
-		menuEdit.add(menuSettings);
+		menuSettings.addActionListener(action);
 
 		menuBar.add(menuEdit);
 
@@ -177,68 +172,29 @@ public class DG645Gui extends JFrame {
 
 		setJMenuBar(menuBar);
 	}
-	
-	
-	
-	                                                     
 
-	/**
-	 * @param args the command line arguments
-	 */
-	/*public static void main(String args[]) {
-		/* Set the Nimbus look and feel */
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-		 * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-		 
-		try {
-			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (ClassNotFoundException ex) {
-			java.util.logging.Logger.getLogger(DG645Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (InstantiationException ex) {
-			java.util.logging.Logger.getLogger(DG645Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (IllegalAccessException ex) {
-			java.util.logging.Logger.getLogger(DG645Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (UnsupportedLookAndFeelException ex) {
-			java.util.logging.Logger.getLogger(DG645Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		}
-		//</editor-fold>
 
-		/* Create and display the form 
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new DG645Gui().setVisible(true);
-			}
-		});
-	}*/
-	
-	
 	// Variables declaration         
 
-private JPanel panelMain;
+	private JPanel panelMain;
 
-private JPanel panelSettings;
-private JMenuBar menuBar;
-private JMenu menuEdit;
-private JMenuItem menuExit;
-private JMenu menuFile;
-private JMenuItem menuSave;
-private JPopupMenu menuSavePopup;
-private JMenu menuTools;
-private JMenu menuView;
+	private JPanel panelSettings;
+	private JMenuBar menuBar;
+	private JMenu menuEdit;
+	private JMenuItem menuExit;
+	private JMenu menuFile;
+	private JMenuItem menuSave;
+	private JPopupMenu menuSavePopup;
+	private JMenu menuTools;
+	private JMenu menuView;
 
 
-private JMenuItem menuSettings;
-private JTabbedPane tabPanel;
+	public JMenuItem menuSettings;
+	private JTabbedPane tabPanel;
 
-public DG645Trigger panelTrigger;
-public DG645Burst panelBurst;
-public DG645Delay panelDelay;
-public DG645Level panelLevel;
+	public DG645Trigger panelTrigger;
+	public DG645Burst panelBurst;
+	public DG645Delay panelDelay;
+	public DG645Level panelLevel;
 }
 

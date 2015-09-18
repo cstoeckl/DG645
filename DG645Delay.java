@@ -297,13 +297,18 @@ public class DG645Delay extends JPanel {
 		
 		public void updateValue()
 		{
+			//selected should always have a value at this point
 			DG645Control.dg645.mConn.writeLine("DLAY? " + selected);
 			response = DG645Control.dg645.mConn.readLine();
 			
 			temp = response.substring(3);
-			temp = ("000.000000000000" + temp).substring(temp.length());
+			temp = ("0.000000000000" + temp).substring(temp.length());
 			
-			value.setText(response.substring(2, 3) + temp);
+			//value.setText(response.substring(2, 3) + temp);
+			
+			value.setText(temp);
+			
+			System.out.println("HERE udpate Temp " + temp);
 		}
 		
 		public Channel(int selected) {
@@ -332,16 +337,24 @@ public class DG645Delay extends JPanel {
 			chan.setPreferredSize(new Dimension(30, textHeight));
 
 			temp = response.substring(3);  
-			temp = ("000.000000000000" + temp).substring(temp.length());
+			temp = ("0.000000000000" + temp).substring(temp.length());
+			
+			System.out.println("Here Temp " + temp);
+			System.out.println("Here response " + response);
+
 			try {
-				value.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("*###.############")));
+				value.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("#.############")));
 			} catch (ParseException ex) {
 				ex.printStackTrace();
 			}
-			value.setText(response.substring(2, 3) + temp);
+			//System.out.println("value "+ value.getText());
+
+			//value.setText(response.substring(2, 3) + temp); IF WANT TO SHOW SIGN
+			value.setText(temp);
 			value.setFont(deFont); 
 			value.setPreferredSize(new Dimension(180, textHeight));
 			value.addPropertyChangeListener(action);
+			//System.out.println("value 2 "+ value.getText());
 
 			GroupLayout chanLayout = new GroupLayout(this);
 			this.setLayout(chanLayout);

@@ -39,10 +39,11 @@ public class DG645Control  {
 		dg645Gui = new DG645Gui();
 		dg645Gui.addWindowListener(l);
 		dg645Gui.pack();
-	//	dg645Gui.setSize(350, 230);
 		dg645Gui.setVisible(true);
+		//dg645Gui.settingsDialog.setAlwaysOnTop(true);
+		//dg645Gui.settingsDialog.setVisible(true);
 		
-		// automatically connect to DG645-Box
+		// automatically connect to DG645
 		dg645Gui.action.connect();
 		
 		//DG645Gui dggui = new DG645Gui();
