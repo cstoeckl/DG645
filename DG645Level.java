@@ -1,26 +1,19 @@
-import java.awt.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
-public class DG645Level extends JPanel {
-
-DG645Action action;
+public class DG645Level extends DG645Menu {
 	
-	//for uniform style
-	Font deFont;
-	int textHeight;
-	
-	private String temp;
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public DG645Level(DG645Gui parent) {
-		this.action = parent.action;
+		super(parent);
 		
-		this.deFont = parent.deFont;
-		this.textHeight = parent.textHeight;
-
-		
-		levelPanel();
-		
+		if(gui.settings.dg645.mConn != null)
+			levelPanel();
+/*		else
+			System.out.println("mconn is null in level");*/
 	}
 	
 	private void levelPanel()
@@ -64,8 +57,8 @@ DG645Action action;
 		labelPolarity.setText("Polarity");
 		labelPolarity.setPreferredSize(new java.awt.Dimension(100, textHeight));
 
-		DG645Control.dg645.mConn.writeLine("LOFF?" + cboxLevel.getSelectedIndex());
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("LOFF?" + cboxLevel.getSelectedIndex());
+		temp = gui.settings.dg645.mConn.readLine();
 		try {
 			txtOffset.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("*#.##")));
 		} catch (java.text.ParseException ex) {
@@ -81,8 +74,8 @@ DG645Action action;
 		labelv.setText("V");
 		labelv.setPreferredSize(new java.awt.Dimension(15, textHeight));
 
-		DG645Control.dg645.mConn.writeLine("LAMP?" + cboxLevel.getSelectedIndex());
-		temp = DG645Control.dg645.mConn.readLine().substring(1);
+		gui.settings.dg645.mConn.writeLine("LAMP?" + cboxLevel.getSelectedIndex());
+		temp = gui.settings.dg645.mConn.readLine().substring(1);
 		temp = ("0.00" + temp).substring(temp.length());
 		try {
 			txtAmp.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("#.##")));
@@ -111,8 +104,8 @@ DG645Action action;
 		buttonNeg.setText("Negative");
 		buttonNeg.setPreferredSize(new java.awt.Dimension(100, textHeight));
 		buttonNeg.addActionListener(action);
-		DG645Control.dg645.mConn.writeLine("LPOL?" + cboxLevel.getSelectedIndex());
-		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
+		gui.settings.dg645.mConn.writeLine("LPOL?" + cboxLevel.getSelectedIndex());
+		switch(Integer.parseInt(gui.settings.dg645.mConn.readLine())) {
 		case 0: levelPolarity.setSelected(buttonNeg.getModel(), true);
 		break;
 		case 1: levelPolarity.setSelected(buttonPos.getModel(), true);

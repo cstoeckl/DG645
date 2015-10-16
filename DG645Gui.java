@@ -1,32 +1,30 @@
 import java.awt.*;
-
 import javax.swing.*;
-
-import lib.DeviceConnection;
-import lib.TimerLabel;
-
 
 public class DG645Gui extends JFrame {
 
-	DG645Action action;
-	DG645Settings settingsDialog;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public DG645Action action;
+	public DG645Settings settings;
+	public DG645Save save;
+	
 	//TimerLabel timerLabel;
 
 	//for uniform style
 	Font deFont = new java.awt.Font("Tahoma", 0, 14);
 	int textHeight = 30;
 
-	private String temp;
 	private int intemp;
-
-	public boolean initRun = true;
 
 	public void checkError()
 	{
-		if(!initRun)
+		if(!settings.initRun)
 		{	
-			DG645Control.dg645.mConn.writeLine("LERR?");
-			intemp = Integer.parseInt(DG645Control.dg645.mConn.readLine());
+			settings.dg645.mConn.writeLine("LERR?");
+			intemp = Integer.parseInt(settings.dg645.mConn.readLine());
 
 			switch(intemp){
 			case 0: break; //No error
@@ -44,6 +42,7 @@ public class DG645Gui extends JFrame {
 			//Parsing Errors
 			case 118: break;//System.out.print("Error 118: Invalid Floating Point Number - The parser expected a floating point number, but was unable to parse it.\nNote: If sure of your number, disregard this error.\n"); break;
 			default: System.out.println("Unknown error:" + intemp + "\nPlease refer to DG645 user manual.\n");
+				
 			}
 		}
 
@@ -52,50 +51,62 @@ public class DG645Gui extends JFrame {
 	/**
 	 * Creates new form DG645Gui
 	 */
-	public DG645Gui() {
+	/*public DG645Gui() {
 		super("DG645Control");
-
+		
+		settings = new DG645Settings(this);
+		
+		save = new DG645Save(this);
 		action=new DG645Action(this);
-		//settingsDialog = new DG645Settings(this);
-
-		//settingsDialog.setVisible(true);
-
-		initComponents();
+		
+	/*	initComponents();
 		initRun = false;
-
 	}
-
-	private void initComponents()
+*/
+	public DG645Gui(DG645Settings settings){
+		super("DG645Control");
+		
+		this.settings = settings;
+		
+		save = new DG645Save(this);
+		action = new DG645Action(this);
+	}
+	
+	public void showGui()
+	{
+		// automatically connect to DG645
+		//action.connect();
+		settings.dg645.connect();
+		
+		pack();
+		setVisible(true);
+	}
+	
+	public void initComponents()
 	{
 		panelMain = new JPanel();
 		tabPanel = new JTabbedPane();
-
 		//frame
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setTitle("DG645 Settings");
 		setPreferredSize(new java.awt.Dimension(1150, 600));
-
 		//main panel
 		panelMain.setPreferredSize(new java.awt.Dimension(1200, 500));
-
 		//tabbed panel
 		tabPanel.setFont(new java.awt.Font("Tahoma", 0, 16)); 
 		tabPanel.setPreferredSize(new java.awt.Dimension(1200, 500));
-
 		//menu bar
 		menu();
-
 		//add revelant tabs to tabbed panel
-
 		panelTrigger = new DG645Trigger(this);
 		panelBurst = new DG645Burst(this);
 		panelDelay = new DG645Delay(this);
 		panelLevel = new DG645Level(this);
+		
 		tabPanel.addTab("Trigger", panelTrigger);
 		tabPanel.addTab("Burst", panelBurst);
 		tabPanel.addTab("Delay", panelDelay);
 		tabPanel.addTab("Level", panelLevel);
-
 		//main panel layout
 		GroupLayout panelMainLayout = new GroupLayout(panelMain);
 		panelMain.setLayout(panelMainLayout);
@@ -109,9 +120,6 @@ public class DG645Gui extends JFrame {
 						.addComponent(tabPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGap(0, 0, Short.MAX_VALUE))
 				);
-
-
-
 
 		//frame layout
 		GroupLayout layout = new GroupLayout(getContentPane());
@@ -147,6 +155,7 @@ public class DG645Gui extends JFrame {
 		menuFile.setText("File");
 
 		menuSave.setText("Save");
+		menuSave.addActionListener(action);
 		menuFile.add(menuSave);
 
 		menuExit.setText("Exit");
@@ -159,7 +168,8 @@ public class DG645Gui extends JFrame {
 
 		menuSettings.setText("Settings");
 		menuSettings.addActionListener(action);
-
+		menuEdit.add(menuSettings);
+		
 		menuBar.add(menuEdit);
 
 		//view
@@ -173,21 +183,20 @@ public class DG645Gui extends JFrame {
 		setJMenuBar(menuBar);
 	}
 
-
 	// Variables declaration         
 
 	private JPanel panelMain;
 
-	private JPanel panelSettings;
+	//private JPanel panelSave;
+	//private JPanel panelSettings;
 	private JMenuBar menuBar;
 	private JMenu menuEdit;
 	private JMenuItem menuExit;
 	private JMenu menuFile;
-	private JMenuItem menuSave;
-	private JPopupMenu menuSavePopup;
+	public JMenuItem menuSave;
+//	private JPopupMenu menuSavePopup;
 	private JMenu menuTools;
 	private JMenu menuView;
-
 
 	public JMenuItem menuSettings;
 	private JTabbedPane tabPanel;
@@ -197,4 +206,3 @@ public class DG645Gui extends JFrame {
 	public DG645Delay panelDelay;
 	public DG645Level panelLevel;
 }
-

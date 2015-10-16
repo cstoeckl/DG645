@@ -1,27 +1,15 @@
 import java.text.DecimalFormat;
 
 import lib.*;
-/*
- * Created on Feb 24, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 
-/**
- * @author csto
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 public class DG645 implements Runnable {
 
-	public DeviceConnection mConn=null;
+	private DG645Settings settings;
+	
+	public DeviceConnection mConn = null;
 	private Thread work;
-	public  String host;
-	public int port;
 	private String tmp;
-	private double z;
+	//private double z;
 	public String relais="000000000000 0.0ns";
 	public boolean isMoving = false;
 	public double Pos = 0.0;
@@ -31,6 +19,10 @@ public class DG645 implements Runnable {
 	public boolean overLimit = false;
 	final static  DecimalFormat valueFormat = new DecimalFormat("0.000");
 
+	//copied from action, is this needed? come back to this
+/*	private Thread waitThread;
+	private int timeout;*/
+	
 	//trigger variables
 	private String mode;
 	private String rate;
@@ -58,13 +50,12 @@ public class DG645 implements Runnable {
 	private String offset;
 	private String amplitude;
 	private String polarity;
-
-	public DG645(String server, int port)
+	
+	public DG645(DG645Settings settings)
 	{
-		host = server;
-		this.port = port;
+		this.settings = settings;
 	}
-
+	
 	public void trigger(String mode, String rate, String threshold, String advmode, String hold, String edge, String prescale, String phase)
 	{
 		if (!connected) return;
@@ -108,8 +99,8 @@ public class DG645 implements Runnable {
 	{
 		if (!connected) return;
 
-		System.out.println("delayVal trsd " + this.delayVal);
-		System.out.println("value " + value);
+		/*System.out.println("delayVal before " + this.delayVal);
+		System.out.println("value " + value);*/
 		if(delayChannel != null)
 			this.delayChannel = delayChannel;
 		if(linkChannel != null)
@@ -117,9 +108,9 @@ public class DG645 implements Runnable {
 		if(value != null)
 			this.delayVal = value.substring(3);
 
-		System.out.println("delayChannel " + this.delayChannel);
+		/*System.out.println("delayChannel " + this.delayChannel);
 		System.out.println("linkChannel " + this.linkChannel);
-		System.out.println("delayVal trsd " + this.delayVal);
+		System.out.println("delayVal after " + this.delayVal);*/
 
 		work = new Thread(this,"Delay");
 		isMoving = true;
@@ -131,8 +122,8 @@ public class DG645 implements Runnable {
 		mConn.writeLine("DLAY? " + delayChannel);
 		String temp = mConn.readLine();
 
-		System.out.println("temp " + temp);
-		System.out.println("temp substring" + temp.substring(0, 3));
+	/*	System.out.println("in delay temp " + temp);
+		System.out.println("temp substring" + temp.substring(0, 3));*/
 		delay(delayChannel, null, temp.substring(0, 3)+value);
 	}
 
@@ -187,13 +178,23 @@ public class DG645 implements Runnable {
 		work.start(); 	
 	}
 
-	public void connect() 
+	public void connect()
 	{
+		//startWait("Connect",5);
+
+		System.out.println("Told to connect");
 		work = new Thread(this,"Connecting");
 		isMoving = true;
 		work.start();
 	}
-
+	
+/*	private synchronized void startWait(String Task, int time)
+	{
+		//gui.timerLabel.start(Task);
+		//timeout = time;
+		notify();
+	}*/
+	
 	public void init() 
 	{
 		if (!connected) return;
@@ -210,7 +211,7 @@ public class DG645 implements Runnable {
 	public void move(double P) 
 	{
 		if (!initialized) return;
-		z = P;
+		//z = P;
 		work = new Thread(this,"Moving");
 		isMoving = true;
 		work.start(); 		
@@ -231,10 +232,20 @@ public class DG645 implements Runnable {
 
 	public void run() 
 	{		
+		System.out.println("Tried to run");
+		
 		try{
 			if (work.getName().startsWith("Connecting")) {
-				mConn = new DeviceConnection(host,port,System.out); 
-				DG645Control.dg645.mConn.writeLine("*CLS");	//Clears ESR, INSR, and LERR
+				System.out.println("Trying to connect");
+				
+				if(mConn == null)
+					System.out.println("mconn pre is null");
+				mConn = new DeviceConnection(settings.ip,settings.port,System.out); 
+				if(mConn == null)
+					System.out.println("mconn post is null");
+				else
+					System.out.println("mconn post not null");
+				mConn.writeLine("*CLS");	//Clears ESR, INSR, and LERR
 				mConn.writeLine("*IDN?");
 				tmp = mConn.readLine();
 				System.out.println("reply: "+ tmp);
@@ -307,28 +318,31 @@ public class DG645 implements Runnable {
 					delay = null;
 				}
 			} else if(work.getName().equals("Delay")) {	
+				if(delayChannel != null && delayVal != null)
+				{	
+					mConn.writeLine("*CLS");
+
+					mConn.writeLine("DLAY?" + delayChannel);
+					String r = mConn.readLine();
+				//	System.out.println("delayChannel " + delayChannel + " read: " + r);
+
+					if(linkChannel == null)
+						linkChannel = r.substring(0, 1);
+
+				//	System.out.println("link " + linkChannel);
+
+				//	System.out.println("DLAY " + delayChannel + "," + linkChannel + "," + delayVal);
+					mConn.writeLine("DLAY " + delayChannel + "," + linkChannel + "," + delayVal);
+
+					delayChannel = null;
+					linkChannel = null;
+					delayVal = null;
+				}
 				if(delayChannel != null && linkChannel != null)
 				{	
 					mConn.writeLine("LINK " + delayChannel + "," + linkChannel);
 					delayChannel = null;
 					linkChannel = null;
-				}
-				if(delayChannel != null && delayVal != null)
-				{	
-					mConn.writeLine("DLAY? " + delayChannel);
-					mConn.writeLine("DLAY? 2");
-					System.out.println("delayChannel " + delayChannel + "read: " + mConn.readLine());
-					//if(linkChannel == null)
-						linkChannel = mConn.readLine().substring(0, 1);
-					
-						System.out.println("link " + linkChannel);
-
-						System.out.println("DLAY " + delayChannel + "," + linkChannel + "," + delayVal);
-					mConn.writeLine("DLAY " + delayChannel + "," + linkChannel + "," + delayVal);
-					
-
-					delayChannel = null;
-					delayVal = null;
 				}
 			} else if(work.getName().equals("Level")) {
 
@@ -355,12 +369,11 @@ public class DG645 implements Runnable {
 				//System.out.println("moving");
 				isMoving = false;	
 			}
-		}catch(Exception e){};
+		}catch(Exception e){
+			System.out.println("exception at DG645");
+			e.printStackTrace();
+		};
 
 		workDone();
 	}
-
-
-
 }
-

@@ -4,24 +4,20 @@ import java.text.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
-public class DG645Burst extends JPanel{
-DG645Action action;
-	
-	//for uniform style
-	Font deFont;
-	int textHeight;
-	
-	private String temp;
-	
-	
-	public DG645Burst(DG645Gui parent) {
-		this.action = parent.action;
-		
-		this.deFont = parent.deFont;
-		this.textHeight = parent.textHeight;
+public class DG645Burst extends DG645Menu{
 
-		burstPanel();
-		
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public DG645Burst(DG645Gui parent) {
+		super(parent);	
+
+		if(gui.settings.dg645.mConn != null)
+			burstPanel();
+	/*	else
+			System.out.println("mconn is null in burst");*/
 	}
 	
 	private void burstPanel()
@@ -56,8 +52,8 @@ DG645Action action;
 		buttonOff.setText("Off");
 		buttonOff.setPreferredSize(new Dimension(60, textHeight));
 		buttonOff.addActionListener(action);
-		DG645Control.dg645.mConn.writeLine("BURM?");
-		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
+		gui.settings.dg645.mConn.writeLine("BURM?");
+		switch(Integer.parseInt(gui.settings.dg645.mConn.readLine())) {
 		case 0: burstOnOff.setSelected(buttonOff.getModel(), true);
 		break;
 		case 1: burstOnOff.setSelected(buttonOn.getModel(), true);
@@ -76,8 +72,8 @@ DG645Action action;
 		buttonOutputFirst.setText("T0 fire on first delay cycle of burst");
 		buttonOutputFirst.setPreferredSize(new Dimension(300, textHeight));
 		buttonOutputFirst.addActionListener(action);
-		DG645Control.dg645.mConn.writeLine("BURT?");
-		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
+		gui.settings.dg645.mConn.writeLine("BURT?");
+		switch(Integer.parseInt(gui.settings.dg645.mConn.readLine())) {
 		case 0: burstOutput.setSelected(buttonOutputAll.getModel(), true);
 		break;
 		case 1: burstOutput.setSelected(buttonOutputFirst.getModel(), true);
@@ -85,8 +81,8 @@ DG645Action action;
 		default: System.out.println("Invalid BURT");
 		}
 
-		DG645Control.dg645.mConn.writeLine("BURC?");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("BURC?");
+		temp = gui.settings.dg645.mConn.readLine();
 		try {
 			txtCNT.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##########")));
 		} catch (ParseException ex) {
@@ -98,9 +94,9 @@ DG645Action action;
 		txtCNT.setPreferredSize(new Dimension(50, textHeight));
 		txtCNT.addPropertyChangeListener(action);
 
-		DG645Control.dg645.mConn.writeLine("BURP?");
-		//temp = DG645Control.dg645.mConn.readLine();
-		temp = DG645Control.dg645.mConn.readLine().substring(1);
+		gui.settings.dg645.mConn.writeLine("BURP?");
+		//temp = gui.settings.dg645.mConn.readLine();
+		temp = gui.settings.dg645.mConn.readLine().substring(1);
 		temp = ("0.00000000" + temp).substring(temp.length());
 		try {
 			txtPeriod.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("#.########")));
@@ -113,9 +109,9 @@ DG645Action action;
 		txtPeriod.setPreferredSize(new Dimension(50, textHeight));
 		txtPeriod.addPropertyChangeListener(action);
 
-		DG645Control.dg645.mConn.writeLine("BURD?");
-		//temp = DG645Control.dg645.mConn.readLine();
-		temp = DG645Control.dg645.mConn.readLine().substring(1);
+		gui.settings.dg645.mConn.writeLine("BURD?");
+		//temp = gui.settings.dg645.mConn.readLine();
+		temp = gui.settings.dg645.mConn.readLine().substring(1);
 		temp = ("0.000000000000" + temp).substring(temp.length());
 		try {
 			txtDelay.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("#.############")));
@@ -193,28 +189,20 @@ DG645Action action;
 	}
 	
     
-public ButtonGroup burstOnOff;
-public ButtonGroup burstOutput;
-
-
-public JRadioButton buttonOff;
-public JRadioButton buttonOn;
-public JRadioButton buttonOutputAll;
-public JRadioButton buttonOutputFirst;
-
-
-
-
-public JFormattedTextField txtCNT;
-public JFormattedTextField txtDelay;
-
-public JFormattedTextField txtPeriod;
-
-
-private JLabel labelDelay;
-private JLabel labelPeriod;
-
-
-private JLabel labelCNT;
+	public ButtonGroup burstOnOff;
+	public ButtonGroup burstOutput;
 	
+	public JRadioButton buttonOff;
+	public JRadioButton buttonOn;
+	public JRadioButton buttonOutputAll;
+	public JRadioButton buttonOutputFirst;
+	
+	public JFormattedTextField txtCNT;
+	public JFormattedTextField txtDelay;
+	public JFormattedTextField txtPeriod;
+	
+	private JLabel labelDelay;
+	private JLabel labelPeriod;
+	
+	private JLabel labelCNT;
 }

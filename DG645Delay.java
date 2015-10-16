@@ -1,28 +1,22 @@
 import java.awt.*;
 import java.text.*;
-
 import javax.swing.*;
 import javax.swing.text.*;
 
-public class DG645Delay extends JPanel {
-	DG645Gui parent;
-	DG645Action action;
-
-	//for uniform style
-	Font deFont;
-	int textHeight;
-
-	private String temp;
-	private int intemp;
+public class DG645Delay extends DG645Menu {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public DG645Delay(DG645Gui parent) {
-		this.parent = parent;
-
-		this.action = parent.action;
-		this.deFont = parent.deFont;
-		this.textHeight = parent.textHeight;
-
-		delayPanel();
+		super(parent);
+		
+		if(gui.settings.dg645.mConn != null)
+			delayPanel();
+	/*	else
+			System.out.println("mconn is null in delay");*/
 	}
 
 	public void updateDelays(String channel)
@@ -42,13 +36,13 @@ public class DG645Delay extends JPanel {
 		}
 
 		updateT1();
-		parent.checkError();
+		gui.checkError();
 	}
 
 	public void updateT1()
 	{
-		DG645Control.dg645.mConn.writeLine("DLAY? 1");
-		temp = DG645Control.dg645.mConn.readLine().substring(2);
+		gui.settings.dg645.mConn.writeLine("DLAY? 1");
+		temp = gui.settings.dg645.mConn.readLine().substring(2);
 		labelT1val.setText(temp);
 	}
 
@@ -113,8 +107,8 @@ public class DG645Delay extends JPanel {
 		labelChannel0.setText("0");
 		labelChannel0.setPreferredSize(new Dimension(55, textHeight));
 
-		DG645Control.dg645.mConn.writeLine("DLAY? 0");  
-		temp = DG645Control.dg645.mConn.readLine().substring(2);
+		gui.settings.dg645.mConn.writeLine("DLAY? 0");  
+		temp = gui.settings.dg645.mConn.readLine().substring(2);
 		labelT0val.setFont(deFont); 
 		labelT0val.setHorizontalAlignment(SwingConstants.CENTER);
 		labelT0val.setText(temp);
@@ -164,8 +158,8 @@ public class DG645Delay extends JPanel {
 		labelT1.setText("T1");
 		labelT1.setPreferredSize(new Dimension(30, textHeight));
 
-		DG645Control.dg645.mConn.writeLine("DLAY? 1");  
-		temp = DG645Control.dg645.mConn.readLine().substring(2);
+		gui.settings.dg645.mConn.writeLine("DLAY? 1");  
+		temp = gui.settings.dg645.mConn.readLine().substring(2);
 		labelT1val.setFont(deFont); 
 		labelT1val.setHorizontalAlignment(SwingConstants.CENTER);
 		labelT1val.setText(temp);
@@ -285,6 +279,10 @@ public class DG645Delay extends JPanel {
 	class Channel extends JPanel{
 
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private JLabel equal;
 		private JLabel chan;
 		public JComboBox cbox;
@@ -298,8 +296,8 @@ public class DG645Delay extends JPanel {
 		public void updateValue()
 		{
 			//selected should always have a value at this point
-			DG645Control.dg645.mConn.writeLine("DLAY? " + selected);
-			response = DG645Control.dg645.mConn.readLine();
+			gui.settings.dg645.mConn.writeLine("DLAY? " + selected);
+			response = gui.settings.dg645.mConn.readLine();
 			
 			temp = response.substring(3);
 			temp = ("0.000000000000" + temp).substring(temp.length());
@@ -322,8 +320,8 @@ public class DG645Delay extends JPanel {
 
 			this.setPreferredSize(new Dimension(430, textHeight));
 
-			DG645Control.dg645.mConn.writeLine("DLAY? " + selected);
-			response = DG645Control.dg645.mConn.readLine();
+			gui.settings.dg645.mConn.writeLine("DLAY? " + selected);
+			response = gui.settings.dg645.mConn.readLine();
 
 			initcbox();
 
@@ -339,8 +337,8 @@ public class DG645Delay extends JPanel {
 			temp = response.substring(3);  
 			temp = ("0.000000000000" + temp).substring(temp.length());
 			
-			System.out.println("Here Temp " + temp);
-			System.out.println("Here response " + response);
+		/*	System.out.println("Here Temp " + temp);
+			System.out.println("Here response " + response);*/
 
 			try {
 				value.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("#.############")));

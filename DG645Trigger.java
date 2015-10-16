@@ -3,26 +3,20 @@ import java.text.*;
 import javax.swing.*;
 
 import javax.swing.text.*;
-public class DG645Trigger extends JPanel{
+
+public class DG645Trigger extends DG645Menu{
 	
-	DG645Action action;
-	
-	//for uniform style
-	Font deFont;
-	int textHeight;
-	
-	private String temp;
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public DG645Trigger(DG645Gui parent) {
-		//this.action = parent.action;
+		super(parent);
 		
-		this.action = new DG645Action(parent);
-
-		this.deFont = parent.deFont;
-		this.textHeight = parent.textHeight;
-
-		triggerPanel();
-		
+		if(gui.settings.dg645.mConn != null)
+			triggerPanel();
+/*		else
+			System.out.println("mconn is null in trigger");*/
 	}
 
 	private void triggerPanel()
@@ -102,8 +96,12 @@ public class DG645Trigger extends JPanel{
 		
 		this.setPreferredSize(new Dimension(1200, 500));
 
-		DG645Control.dg645.mConn.writeLine("TRAT?");
-		temp = DG645Control.dg645.mConn.readLine().substring(1);
+		System.out.println("dg645" + gui.settings.dg645.toString());
+		if(gui.settings.dg645.mConn == null)
+			System.out.println("mconn is null in trigger");
+		gui.settings.dg645.mConn.writeLine("TRAT?");
+
+		temp = gui.settings.dg645.mConn.readLine().substring(1);
 		temp = ("000000000000000" + temp).substring(temp.length());
 		try {
 			txtTrigRate.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###,###.######")));
@@ -117,8 +115,8 @@ public class DG645Trigger extends JPanel{
 		txtTrigRate.setPreferredSize(new Dimension(150, textHeight));
 		txtTrigRate.addPropertyChangeListener(action);
 
-		DG645Control.dg645.mConn.writeLine("TLVL?");
-		temp = DG645Control.dg645.mConn.readLine(); //.substring(1);
+		gui.settings.dg645.mConn.writeLine("TLVL?");
+		temp = gui.settings.dg645.mConn.readLine(); //.substring(1);
 		//temp = ("0.00" + temp).substring(temp.length());
 		try {
 			MaskFormatter formatter = new MaskFormatter("*#.##");
@@ -127,6 +125,7 @@ public class DG645Trigger extends JPanel{
 		} catch (ParseException ex) {
 			ex.printStackTrace();
 		}
+		
 		txtTrigThres.setText(temp);
 		txtTrigThres.setToolTipText("External Triggering; Range -3.50 to +3.50");
 		txtTrigThres.setFont(deFont); 
@@ -144,8 +143,8 @@ public class DG645Trigger extends JPanel{
 		buttonTrigOff.setText("Off");
 		buttonTrigOff.setPreferredSize(new Dimension(50, textHeight));
 		buttonTrigOff.addActionListener(action);
-		DG645Control.dg645.mConn.writeLine("ADVT?");
-		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
+		gui.settings.dg645.mConn.writeLine("ADVT?");
+		switch(Integer.parseInt(gui.settings.dg645.mConn.readLine())) {
 		case 0: triggerAdv.setSelected(buttonTrigOff.getModel(), true);
 		break;
 		case 1: triggerAdv.setSelected(buttonTrigOn.getModel(), true);
@@ -153,8 +152,8 @@ public class DG645Trigger extends JPanel{
 		default: System.out.println("Invalid ADVT");
 		}
 
-		DG645Control.dg645.mConn.writeLine("HOLD?");
-		temp = DG645Control.dg645.mConn.readLine().substring(1);
+		gui.settings.dg645.mConn.writeLine("HOLD?");
+		temp = gui.settings.dg645.mConn.readLine().substring(1);
 		temp = ("0.000000000000" + temp).substring(temp.length());
 		try {
 			txtHold.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("#.############")));
@@ -166,7 +165,6 @@ public class DG645Trigger extends JPanel{
 		txtHold.setPreferredSize(new Dimension(160, textHeight));
 		txtHold.addPropertyChangeListener(action);
 		
-
 		labelTrigRate.setFont(new Font("Tahoma", 1, 14)); 
 		labelTrigRate.setText("Trig Rate");
 		labelTrigRate.setPreferredSize(new Dimension(90, textHeight));
@@ -228,8 +226,8 @@ public class DG645Trigger extends JPanel{
 		labelTrigPS.setText("TRG Prescale");
 		labelTrigPS.setPreferredSize(new Dimension(100, textHeight));
 
-		DG645Control.dg645.mConn.writeLine("PRES? 0");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("PRES? 0");
+		temp = gui.settings.dg645.mConn.readLine();
 		temp = ("0000000000" + temp).substring(temp.length());
 		try {
 			txtTrigPres.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("#,###,###,###")));
@@ -282,8 +280,8 @@ public class DG645Trigger extends JPanel{
 		labelGHphase.setText("GH Phase");
 		labelGHphase.setPreferredSize(new Dimension(85, textHeight));
 
-		DG645Control.dg645.mConn.writeLine("PRES? 1");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("PRES? 1");
+		temp = gui.settings.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtABpres.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###")));
@@ -297,8 +295,8 @@ public class DG645Trigger extends JPanel{
 		txtABpres.addPropertyChangeListener(action);
 		
 
-		DG645Control.dg645.mConn.writeLine("PRES? 2");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("PRES? 2");
+		temp = gui.settings.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtCDpres.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###")));
@@ -311,8 +309,8 @@ public class DG645Trigger extends JPanel{
 		txtCDpres.setPreferredSize(new Dimension(100, textHeight));
 		txtCDpres.addPropertyChangeListener(action);
 
-		DG645Control.dg645.mConn.writeLine("PRES? 3");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("PRES? 3");
+		temp = gui.settings.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtEFpres.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###")));
@@ -325,8 +323,8 @@ public class DG645Trigger extends JPanel{
 		txtEFpres.setPreferredSize(new Dimension(100, textHeight));
 		txtEFpres.addPropertyChangeListener(action);
 
-		DG645Control.dg645.mConn.writeLine("PRES? 4");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("PRES? 4");
+		temp = gui.settings.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtGHpres.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###")));
@@ -339,8 +337,8 @@ public class DG645Trigger extends JPanel{
 		txtGHpres.setPreferredSize(new Dimension(100, textHeight));
 		txtGHpres.addPropertyChangeListener(action);
 
-		DG645Control.dg645.mConn.writeLine("PHAS? 1");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("PHAS? 1");
+		temp = gui.settings.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtABphase.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###")));
@@ -353,8 +351,8 @@ public class DG645Trigger extends JPanel{
 		txtABphase.setPreferredSize(new Dimension(100, textHeight));
 		txtABphase.addPropertyChangeListener(action);
 
-		DG645Control.dg645.mConn.writeLine("PHAS? 2");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("PHAS? 2");
+		temp = gui.settings.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtCDphase.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###")));
@@ -367,8 +365,8 @@ public class DG645Trigger extends JPanel{
 		txtCDphase.setPreferredSize(new Dimension(100, textHeight));
 		txtCDphase.addPropertyChangeListener(action);
 
-		DG645Control.dg645.mConn.writeLine("PHAS? 3");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("PHAS? 3");
+		temp = gui.settings.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtEFphase.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###")));
@@ -381,8 +379,8 @@ public class DG645Trigger extends JPanel{
 		txtEFphase.setPreferredSize(new Dimension(100, textHeight));
 		txtEFphase.addPropertyChangeListener(action);
 
-		DG645Control.dg645.mConn.writeLine("PHAS? 4");
-		temp = DG645Control.dg645.mConn.readLine();
+		gui.settings.dg645.mConn.writeLine("PHAS? 4");
+		temp = gui.settings.dg645.mConn.readLine();
 		temp = ("00000" + temp).substring(temp.length());
 		try {
 			txtGHphase.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##,###")));
@@ -601,8 +599,9 @@ public class DG645Trigger extends JPanel{
 		buttonLine.addActionListener(action);
 
 		//initial selected mode
-		DG645Control.dg645.mConn.writeLine("TSRC?");
-		switch(Integer.parseInt(DG645Control.dg645.mConn.readLine())) {
+		gui.settings.dg645.mConn.writeLine("TSRC?");
+		
+		switch(Integer.parseInt(gui.settings.dg645.mConn.readLine())) {
 		case 0: triggerModes.setSelected(buttonInt.getModel(), true); break;
 		case 1: triggerModes.setSelected(buttonExtR.getModel(), true); break;
 		case 2: triggerModes.setSelected(buttonExtF.getModel(), true); break;
